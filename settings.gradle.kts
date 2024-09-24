@@ -23,3 +23,4 @@ rootProject.name = "HealthCompanion"
 include(":app")
 include(":utils")
 include(":test-utils")
+include(":timer")

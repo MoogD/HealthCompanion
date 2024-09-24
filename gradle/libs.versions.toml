@@ -1,23 +1,24 @@
 [versions]
-agp = "8.6.0"
+agp = "8.6.1"
 kotlin = "2.0.20"
 coreKtx = "1.13.1"
-junit = "4.13.2"
-junitVersion = "1.2.1"
-espressoCore = "3.6.1"
-lifecycleRuntimeKtx = "2.8.5"
+junitBom = "5.11.0"
+lifecycleRuntimeKtx = "2.8.6"
 activityCompose = "1.9.2"
-composeBom = "2024.09.01"
-navigation = "2.8.0"
+composeBom = "2024.09.02"
+navigation = "2.8.1"
 ktlint = "12.1.1"
 hilt = "2.51.1"
 ksp = "2.0.20-1.0.24"
+composeConstraintLayout = "1.0.1"
+jetbrainsKotlinJvm = "2.0.20"
+coroutines = "1.9.0"
+mockk = "1.13.12"
+hamcrest = "1.3"
+kover = "0.8.3"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
-junit = { group = "junit", name = "junit", version.ref = "junit" }
-androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
-androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
 androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
@@ -29,10 +30,24 @@ androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-man
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 androidx-navigation = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigation" }
+compose-constraint-layout = { group = "androidx.constraintlayout", name = "constraintlayout-compose", version.ref = "composeConstraintLayout" }
+
+# testing
+junit-bom = { group = "org.junit", name = "junit-bom", version.ref = "junitBom" }
+junit-jupiter = { group = "org.junit.jupiter", name = "junit-jupiter" }
+junit-platform = { group = "org.junit.platform", name = "junit-platform-launcher" }
+mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
+#mockk-android = { group = "io.mockk", name = "mockk-android", version.ref = "mockk" }
+#mockk-agent = { group = "io.mockk", name = "mockk-agent", version.ref = "mockk" }
+hamcrest = { group = "org.hamcrest", name = "hamcrest-all", version.ref = "hamcrest" }
 
 # di
 hilt = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
 hilt-compiler = { group = "com.google.dagger", name = "hilt-compiler", version.ref = "hilt" }
+
+# coroutines
+kotlinx-coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "coroutines" }
+kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutines" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -41,3 +56,5 @@ compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "
 ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlint" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "jetbrainsKotlinJvm" }
+kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kover"}

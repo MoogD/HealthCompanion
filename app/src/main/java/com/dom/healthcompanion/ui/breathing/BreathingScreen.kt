@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import com.dom.healthcompanion.R
+import com.dom.healthcompanion.domain.breathing.model.BreathingExercise
 import com.dom.healthcompanion.ui.theme.PurpleGrey80
 import com.dom.healthcompanion.utils.ButtonState
 import com.dom.healthcompanion.utils.Text

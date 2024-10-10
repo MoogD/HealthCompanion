@@ -3,7 +3,6 @@ package com.dom.utils
 import kotlinx.coroutines.Dispatchers
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert.assertThat
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 class DispatchersProviderImplTest {
@@ -16,12 +15,7 @@ class DispatchersProviderImplTest {
 
     // endregion
 
-    private lateinit var sut: DispatchersProviderImpl
-
-    @BeforeEach
-    fun setUp() {
-        sut = DispatchersProviderImpl()
-    }
+    private val sut: DispatchersProviderImpl = DispatchersProviderImpl
 
     @Test
     fun `1- When main called, then return Dispatchers Main`() {

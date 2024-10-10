@@ -1,6 +1,5 @@
 package com.dom.healthcompanion.ui.featureList
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.dom.healthcompanion.R
 import com.dom.healthcompanion.ui.navigation.NavItem
@@ -23,7 +22,6 @@ class FeatureListViewModel
                 listOf(
                     FeatureItem(R.string.feature_breathing) {
                         navigator.navigateTo(NavItem.BREATHING)
-                        Log.d("FeatureListViewModel", "Breathing clicked!")
                     },
                 )
         }

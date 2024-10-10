@@ -1,4 +1,4 @@
-package com.dom.healthcompanion.ui.breathing
+package com.dom.healthcompanion.domain.breathing.model
 
 import com.dom.healthcompanion.utils.Text
 
@@ -21,6 +21,7 @@ interface BreathingExercise {
     )
 
     enum class RoundType {
+        IDLE,
         INHALE,
         EXHALE,
         HOLD,

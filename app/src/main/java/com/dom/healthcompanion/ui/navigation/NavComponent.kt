@@ -2,7 +2,7 @@ package com.dom.healthcompanion.ui.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -18,7 +18,7 @@ fun NavigationComponent(
     navController: NavHostController,
     navigator: Navigator,
 ) {
-    val featureListViewModel: FeatureListViewModel = viewModel()
+    val featureListViewModel: FeatureListViewModel = hiltViewModel()
     LaunchedEffect("navigation") {
         navigator.navTarget.onEach {
             navController.navigate(it.navName)
@@ -29,7 +29,7 @@ fun NavigationComponent(
             FeatureListScreen(featureListViewModel.featureItems)
         }
         composable(NavItem.BREATHING.navName) {
-            val breathingViewModel: BreathingViewModel = viewModel()
+            val breathingViewModel: BreathingViewModel = hiltViewModel()
             BreathingScreen(
                 breathingViewModel.titleFlow,
                 breathingViewModel.timerStateFlow,

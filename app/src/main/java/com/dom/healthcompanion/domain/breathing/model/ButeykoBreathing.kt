@@ -1,7 +1,7 @@
-package com.dom.healthcompanion.ui.breathing
+package com.dom.healthcompanion.domain.breathing.model
 
 import com.dom.healthcompanion.R
-import com.dom.healthcompanion.ui.breathing.BreathingExercise.Companion.OPEN_TIMER
+import com.dom.healthcompanion.domain.breathing.model.BreathingExercise.Companion.OPEN_TIMER
 import com.dom.healthcompanion.utils.Text
 import java.util.concurrent.TimeUnit
 

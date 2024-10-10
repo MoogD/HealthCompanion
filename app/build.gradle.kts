@@ -62,8 +62,10 @@ android {
 }
 
 dependencies {
+    // internal modules
     implementation(project(":timer"))
     implementation(project(":utils"))
+    testImplementation(project(":test-utils"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -80,7 +82,9 @@ dependencies {
 
     // DI
     implementation(libs.hilt)
+    implementation(libs.hilt.compose)
     ksp(libs.hilt.compiler)
+    ksp(libs.hilt.android.compiler)
 
     // unit tests
     testImplementation(platform(libs.junit.bom))
@@ -101,15 +105,18 @@ kover {
         filters {
             excludes {
                 classes(
+                    // exclude DI
                     "dagger.hilt.internal.aggregatedroot.codegen.*",
                     "hilt_aggregated_deps.*",
-                    "com.dom.healthcompanion.ui.theme.*",
-                    "com.dom.healthcompanion.ui.HealthCompanionApplication",
+                    "com.dom.healthcompanion.di",
                     "*Hilt_*",
                     "*_HiltModules*",
                     "*_Factory*",
                     "*_MembersInjector*",
                     "*ComposableSingletons*",
+                    // exclude ui specifics
+                    "com.dom.healthcompanion.ui.theme.*",
+                    "com.dom.healthcompanion.ui.HealthCompanionApplication",
                     "com.dom.healthcompanion.ui.main.MainActivity",
                 )
                 annotatedBy("androidx.compose.ui.tooling.preview.Preview")

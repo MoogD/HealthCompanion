@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
+    alias(libs.plugins.kover)
 }
 
 android {
@@ -53,6 +54,9 @@ android {
 }
 
 dependencies {
+    implementation(project(":timer"))
+    implementation(project(":utils"))
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -66,8 +70,35 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation(libs.androidx.navigation)
+    implementation(libs.compose.constraint.layout)
 
     // DI
     implementation(libs.hilt)
     ksp(libs.hilt.compiler)
+
+    // kover report
+    kover(project(":timer"))
+    kover(project(":utils"))
+}
+
+kover {
+    reports {
+        filters {
+            excludes {
+                classes(
+                    "dagger.hilt.internal.aggregatedroot.codegen.*",
+                    "hilt_aggregated_deps.*",
+                    "com.dom.healthcompanion.ui.theme.*",
+                    "com.dom.healthcompanion.ui.HealthCompanionApplication",
+                    "*Hilt_*",
+                    "*_HiltModules*",
+                    "*_Factory*",
+                    "*_MembersInjector*",
+                    "*ComposableSingletons*",
+                    "com.dom.healthcompanion.ui.main.MainActivity",
+                )
+                annotatedBy("androidx.compose.ui.tooling.preview.Preview")
+            }
+        }
+    }
 }

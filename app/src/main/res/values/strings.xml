@@ -1,3 +1,12 @@
 <resources>
     <string name="app_name">HealthCompanion</string>
+
+    <string name="feature_breathing">Breathing</string>
+    <string name="breathing_screen_default_title">Breathing exercise</string>
+    <string name="buteyko_breathing_title">Buteyko Breathing</string>
+
+    <string name="btnStartText">Start</string>
+    <string name="btnStopText">Stop</string>
+    <string name="btnPauseText">Pause</string>
+    <string name="btnNextText">Next</string>
 </resources>

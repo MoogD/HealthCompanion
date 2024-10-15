@@ -46,6 +46,14 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.1"
     }
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+        }
+    }
+    tasks.withType<Test> {
+        useJUnitPlatform()
+    }
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
@@ -54,8 +62,10 @@ android {
 }
 
 dependencies {
+    // internal modules
     implementation(project(":timer"))
     implementation(project(":utils"))
+    testImplementation(project(":test-utils"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -65,8 +75,6 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation(libs.androidx.navigation)
@@ -74,7 +82,18 @@ dependencies {
 
     // DI
     implementation(libs.hilt)
+    implementation(libs.hilt.compose)
     ksp(libs.hilt.compiler)
+    ksp(libs.hilt.android.compiler)
+
+    // unit tests
+    testImplementation(platform(libs.junit.bom))
+    testImplementation(libs.junit.jupiter)
+    testRuntimeOnly(libs.junit.platform)
+    testImplementation(libs.mockk)
+    testImplementation(libs.hamcrest)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.turbine)
 
     // kover report
     kover(project(":timer"))
@@ -86,15 +105,18 @@ kover {
         filters {
             excludes {
                 classes(
+                    // exclude DI
                     "dagger.hilt.internal.aggregatedroot.codegen.*",
                     "hilt_aggregated_deps.*",
-                    "com.dom.healthcompanion.ui.theme.*",
-                    "com.dom.healthcompanion.ui.HealthCompanionApplication",
+                    "com.dom.healthcompanion.di",
                     "*Hilt_*",
                     "*_HiltModules*",
                     "*_Factory*",
                     "*_MembersInjector*",
                     "*ComposableSingletons*",
+                    // exclude ui specifics
+                    "com.dom.healthcompanion.ui.theme.*",
+                    "com.dom.healthcompanion.ui.HealthCompanionApplication",
                     "com.dom.healthcompanion.ui.main.MainActivity",
                 )
                 annotatedBy("androidx.compose.ui.tooling.preview.Preview")

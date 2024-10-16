@@ -14,7 +14,8 @@ android {
     defaultConfig {
         applicationId = "com.dom.healthcompanion"
         minSdk = 24
-        targetSdk = 35
+        // Robolectric not running with sdk 35
+        targetSdk = 34
         versionCode = 1
         versionName = "1.0"
 
@@ -53,6 +54,7 @@ android {
     }
     tasks.withType<Test> {
         useJUnitPlatform()
+        enabled = true
     }
     packaging {
         resources {
@@ -76,7 +78,6 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     debugImplementation(libs.androidx.ui.tooling)
-    debugImplementation(libs.androidx.ui.test.manifest)
     implementation(libs.androidx.navigation)
     implementation(libs.compose.constraint.layout)
 
@@ -90,10 +91,21 @@ dependencies {
     testImplementation(platform(libs.junit.bom))
     testImplementation(libs.junit.jupiter)
     testRuntimeOnly(libs.junit.platform)
+    testRuntimeOnly(libs.junit.vintage)
     testImplementation(libs.mockk)
     testImplementation(libs.hamcrest)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.turbine)
+
+    // compose tests
+    testImplementation(libs.junit)
+    androidTestImplementation(platform(libs.androidx.compose.bom))
+    debugImplementation(libs.androidx.ui.test.manifest)
+    androidTestImplementation(libs.androidx.ui.test.junit4)
+    testImplementation(libs.androidx.ui.test.junit4)
+    testImplementation(libs.robolectric)
+    // needed to resolve activity with roboletics unit tests
+    debugImplementation(libs.fragment.testing)
 
     // kover report
     kover(project(":timer"))
@@ -102,24 +114,26 @@ dependencies {
 
 kover {
     reports {
-        filters {
-            excludes {
-                classes(
-                    // exclude DI
-                    "dagger.hilt.internal.aggregatedroot.codegen.*",
-                    "hilt_aggregated_deps.*",
-                    "com.dom.healthcompanion.di",
-                    "*Hilt_*",
-                    "*_HiltModules*",
-                    "*_Factory*",
-                    "*_MembersInjector*",
-                    "*ComposableSingletons*",
-                    // exclude ui specifics
-                    "com.dom.healthcompanion.ui.theme.*",
-                    "com.dom.healthcompanion.ui.HealthCompanionApplication",
-                    "com.dom.healthcompanion.ui.main.MainActivity",
-                )
-                annotatedBy("androidx.compose.ui.tooling.preview.Preview")
+        variant("debug") {
+            filters {
+                excludes {
+                    classes(
+                        // exclude DI
+                        "dagger.hilt.internal.aggregatedroot.codegen.*",
+                        "hilt_aggregated_deps.*",
+                        "com.dom.healthcompanion.di",
+                        "*Hilt_*",
+                        "*_HiltModules*",
+                        "*_Factory*",
+                        "*_MembersInjector*",
+                        "*ComposableSingletons*",
+                        // exclude ui specifics
+                        "com.dom.healthcompanion.ui.theme.*",
+                        "com.dom.healthcompanion.ui.HealthCompanionApplication",
+                        "com.dom.healthcompanion.ui.main.MainActivity",
+                    )
+                    annotatedBy("androidx.compose.ui.tooling.preview.Preview")
+                }
             }
         }
     }

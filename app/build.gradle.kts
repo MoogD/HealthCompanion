@@ -114,26 +114,24 @@ dependencies {
 
 kover {
     reports {
-        variant("debug") {
-            filters {
-                excludes {
-                    classes(
-                        // exclude DI
-                        "dagger.hilt.internal.aggregatedroot.codegen.*",
-                        "hilt_aggregated_deps.*",
-                        "com.dom.healthcompanion.di",
-                        "*Hilt_*",
-                        "*_HiltModules*",
-                        "*_Factory*",
-                        "*_MembersInjector*",
-                        "*ComposableSingletons*",
-                        // exclude ui specifics
-                        "com.dom.healthcompanion.ui.theme.*",
-                        "com.dom.healthcompanion.ui.HealthCompanionApplication",
-                        "com.dom.healthcompanion.ui.main.MainActivity",
-                    )
-                    annotatedBy("androidx.compose.ui.tooling.preview.Preview")
-                }
+        filters {
+            excludes {
+                classes(
+                    // exclude DI
+                    "dagger.hilt.internal.aggregatedroot.codegen.*",
+                    "hilt_aggregated_deps.*",
+                    "com.dom.healthcompanion.di",
+                    "*Hilt_*",
+                    "*_HiltModules*",
+                    "*_Factory*",
+                    "*_MembersInjector*",
+                    "*ComposableSingletons*",
+                    // exclude ui specifics
+                    "com.dom.healthcompanion.ui.theme.*",
+                    "com.dom.healthcompanion.ui.HealthCompanionApplication",
+                    "com.dom.healthcompanion.ui.main.MainActivity",
+                )
+                annotatedBy("androidx.compose.ui.tooling.preview.Preview")
             }
         }
     }

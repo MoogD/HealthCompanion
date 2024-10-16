@@ -29,6 +29,5 @@ jobs:
       - name: Check code formatting
         run: ./gradlew ktlintCheck
 
-      # run debug version to avoid issues with roboletics
       - name: Run unit tests
-        run: ./gradlew testDebug
+        run: ./gradlew test

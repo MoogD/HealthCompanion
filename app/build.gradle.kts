@@ -120,7 +120,7 @@ kover {
                     // exclude DI
                     "dagger.hilt.internal.aggregatedroot.codegen.*",
                     "hilt_aggregated_deps.*",
-                    "com.dom.healthcompanion.di",
+                    "com.dom.healthcompanion.di.*",
                     "*Hilt_*",
                     "*_HiltModules*",
                     "*_Factory*",

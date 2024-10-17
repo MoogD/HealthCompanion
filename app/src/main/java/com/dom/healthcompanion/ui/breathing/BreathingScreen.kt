@@ -15,6 +15,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -23,6 +24,7 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import com.dom.healthcompanion.R
 import com.dom.healthcompanion.domain.breathing.model.BreathingExercise
+import com.dom.healthcompanion.ui.TestTags
 import com.dom.healthcompanion.ui.theme.PurpleGrey80
 import com.dom.healthcompanion.utils.ButtonState
 import com.dom.healthcompanion.utils.Text
@@ -64,31 +66,37 @@ fun BreathingScreen(
             text = titleString,
             fontSize = 24.sp,
             modifier =
-                Modifier.constrainAs(txtTitle) {
-                    top.linkTo(parent.top, margin = 24.dp)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                },
+                Modifier
+                    .testTag(TestTags.TITLE_TEXT_TAG)
+                    .constrainAs(txtTitle) {
+                        top.linkTo(parent.top, margin = 24.dp)
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                    },
         )
         Text(
             text = timerState.value.type.name,
             fontSize = 24.sp,
             modifier =
-                Modifier.constrainAs(txtRoundType) {
-                    top.linkTo(txtTitle.top, margin = 48.dp)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                },
+                Modifier
+                    .testTag(TestTags.TIMER_TYPE_TEXT_TAG)
+                    .constrainAs(txtRoundType) {
+                        top.linkTo(txtTitle.top, margin = 48.dp)
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                    },
         )
         Text(
             text = timerState.value.currentTimeText,
             fontSize = 24.sp,
             modifier =
-                Modifier.constrainAs(txtCurrentTime) {
-                    top.linkTo(txtRoundType.bottom, margin = 96.dp)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                },
+                Modifier
+                    .testTag(TestTags.TIMER_CURRENT_TIME_TEXT_TAG)
+                    .constrainAs(txtCurrentTime) {
+                        top.linkTo(txtRoundType.bottom, margin = 96.dp)
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                    },
         )
         CircularProgressIndicator(
             progress = { timerState.value.progress },
@@ -132,11 +140,13 @@ fun BreathingScreen(
             text = timerState.value.totalTimeText,
             fontSize = 24.sp,
             modifier =
-                Modifier.constrainAs(txtTotal) {
-                    bottom.linkTo(bottomGuideline)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                },
+                Modifier
+                    .testTag(TestTags.TIMER_TOTAL_TIME_TEXT_TAG)
+                    .constrainAs(txtTotal) {
+                        bottom.linkTo(bottomGuideline)
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                    },
         )
         Button(
             onClick = buttonState.value.onClick,
@@ -164,7 +174,13 @@ fun BreathingScreen(
 @Composable
 fun ListItem(data: TimerLap) {
     Row {
-        Text(text = "${data.index}: ${data.time}", modifier = Modifier.padding(16.dp, 2.dp))
+        Text(
+            text = "${data.index}: ${data.time}",
+            modifier =
+                Modifier
+                    .testTag(TestTags.TIMER_LAP_LIST_TEXT_ITEM_TAG)
+                    .padding(16.dp, 2.dp),
+        )
     }
 }
 

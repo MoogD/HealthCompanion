@@ -18,14 +18,15 @@ fun NavigationComponent(
     navController: NavHostController,
     navigator: Navigator,
 ) {
-    val featureListViewModel: FeatureListViewModel = hiltViewModel()
-    LaunchedEffect("navigation") {
+    // match lifecycle of NavigationComponent
+    LaunchedEffect(true) {
         navigator.navTarget.onEach {
             navController.navigate(it.navName)
         }.launchIn(this)
     }
     NavHost(navController = navController, startDestination = NavItem.FEATURE_LIST.navName) {
         composable(NavItem.FEATURE_LIST.navName) {
+            val featureListViewModel: FeatureListViewModel = hiltViewModel()
             FeatureListScreen(featureListViewModel.featureItems)
         }
         composable(NavItem.BREATHING.navName) {

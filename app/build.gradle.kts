@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
     alias(libs.plugins.kover)
+    alias(libs.plugins.mockposable)
 }
 
 android {
@@ -99,19 +100,23 @@ dependencies {
 
     // compose tests
     testImplementation(libs.junit)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
     debugImplementation(libs.androidx.ui.test.manifest)
-    androidTestImplementation(libs.androidx.ui.test.junit4)
     testImplementation(libs.androidx.ui.test.junit4)
     testImplementation(libs.robolectric)
     // needed to resolve activity with roboletics unit tests
     debugImplementation(libs.fragment.testing)
+    testImplementation(libs.androidx.navigation.testing)
+    kspTest(libs.hilt.android.compiler)
+    testImplementation(libs.hilt.testing)
 
     // kover report
     kover(project(":timer"))
     kover(project(":utils"))
 }
-
+mockposable {
+    plugins = listOf("mockk", "compose-ui")
+    composeCompilerPluginVersion = libs.versions.kotlin.get()
+}
 kover {
     reports {
         filters {

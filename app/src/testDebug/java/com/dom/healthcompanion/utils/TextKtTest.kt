@@ -38,6 +38,7 @@ class TextKtTest {
     @Test
     fun `2- When getAsString invoked, given Text is TextString, then return correct string directly`() {
         // Arrange
+
         val expectedText = "test2131"
         val sut = Text.TextString(expectedText)
         // Act

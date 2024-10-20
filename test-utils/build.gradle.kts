@@ -12,4 +12,6 @@ dependencies {
     implementation(project(":utils"))
     implementation(libs.kotlinx.coroutines)
     implementation(libs.kotlinx.coroutines.test)
+    implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.ui.test.junit4)
 }

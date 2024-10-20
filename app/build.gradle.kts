@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
     alias(libs.plugins.kover)
+    alias(libs.plugins.mockposable)
 }
 
 android {
@@ -14,7 +15,8 @@ android {
     defaultConfig {
         applicationId = "com.dom.healthcompanion"
         minSdk = 24
-        targetSdk = 35
+        // Robolectric not running with sdk 35
+        targetSdk = 34
         versionCode = 1
         versionName = "1.0"
 
@@ -53,6 +55,7 @@ android {
     }
     tasks.withType<Test> {
         useJUnitPlatform()
+        enabled = true
     }
     packaging {
         resources {
@@ -76,7 +79,6 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     debugImplementation(libs.androidx.ui.tooling)
-    debugImplementation(libs.androidx.ui.test.manifest)
     implementation(libs.androidx.navigation)
     implementation(libs.compose.constraint.layout)
 
@@ -90,16 +92,31 @@ dependencies {
     testImplementation(platform(libs.junit.bom))
     testImplementation(libs.junit.jupiter)
     testRuntimeOnly(libs.junit.platform)
+    testRuntimeOnly(libs.junit.vintage)
     testImplementation(libs.mockk)
     testImplementation(libs.hamcrest)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.turbine)
 
+    // compose tests
+    testImplementation(libs.junit)
+    debugImplementation(libs.androidx.ui.test.manifest)
+    testImplementation(libs.androidx.ui.test.junit4)
+    testImplementation(libs.robolectric)
+    // needed to resolve activity with roboletics unit tests
+    debugImplementation(libs.fragment.testing)
+    testImplementation(libs.androidx.navigation.testing)
+    kspTest(libs.hilt.android.compiler)
+    testImplementation(libs.hilt.testing)
+
     // kover report
     kover(project(":timer"))
     kover(project(":utils"))
 }
-
+mockposable {
+    plugins = listOf("mockk", "compose-ui")
+    composeCompilerPluginVersion = libs.versions.kotlin.get()
+}
 kover {
     reports {
         filters {
@@ -108,7 +125,7 @@ kover {
                     // exclude DI
                     "dagger.hilt.internal.aggregatedroot.codegen.*",
                     "hilt_aggregated_deps.*",
-                    "com.dom.healthcompanion.di",
+                    "com.dom.healthcompanion.di.*",
                     "*Hilt_*",
                     "*_HiltModules*",
                     "*_Factory*",

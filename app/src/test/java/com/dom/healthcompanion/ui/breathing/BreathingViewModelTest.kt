@@ -80,6 +80,10 @@ class BreathingViewModelTest {
     // 35- When onCleared invoked, given there is timer, then call stop on timer and remove listeners
     // 36- When onCleared invoked, given there is no timer, then nothing happens
 
+    // 37- When pause button state clicked, then call pause on timer and show resume button state
+
+    // 38- When resume button state clicked, then call resume on timer and show pause button state
+
     // endregion
     val defaultExercise = ButeykoBreathing()
     private val getCurrentBreathingExerciseUseCase: GetCurrentBreathingExerciseUseCase = mockk()
@@ -504,13 +508,11 @@ class BreathingViewModelTest {
                 sut = BreathingViewModel(getCurrentBreathingExerciseUseCase, testDispatcher)
 
                 clearMocks(getCurrentBreathingExerciseUseCase, answers = false)
-                // update index of current exercise to simulate timer running before
-//                expectedExercise.currenRoundIndex = expectedExercise.rounds.lastIndex
                 // start timer by button press
                 sut.buttonStateFlow.value.onClick.invoke()
                 // simulate all timers done by listener calls
-                repeat(expectedExercise.rounds.size) {
-                    listenerSlot.captured.onFinish()
+                expectedExercise.rounds.forEach {
+                    listenerSlot.captured.onFinish(it.expectedTime)
                 }
 
                 // Act
@@ -534,7 +536,7 @@ class BreathingViewModelTest {
             runTest {
                 // Arrange
                 mockkConstructor(CountUpTimerImpl::class)
-                justRun { anyConstructed<CountUpTimerImpl>().stop() }
+                every { anyConstructed<CountUpTimerImpl>().stop() } returns 0
                 val expectedExercise =
                     object : BreathingExercise {
                         override val title: Text = Text.TextRes(R.string.buteyko_breathing_title)
@@ -570,7 +572,7 @@ class BreathingViewModelTest {
             runTest {
                 // Arrange
                 mockkConstructor(CountUpTimerImpl::class)
-                justRun { anyConstructed<CountUpTimerImpl>().stop() }
+                every { anyConstructed<CountUpTimerImpl>().stop() } returns passedTime
                 justRun { anyConstructed<CountUpTimerImpl>().start() }
                 val expectedExercise =
                     object : BreathingExercise {
@@ -592,7 +594,6 @@ class BreathingViewModelTest {
                     }
                 every { getCurrentBreathingExerciseUseCase() } returns expectedExercise
                 sut = BreathingViewModel(getCurrentBreathingExerciseUseCase, testDispatcher)
-                every { anyConstructed<CountUpTimerImpl>().time } returns passedTime
                 // start timer to trigger update of button state to next button
                 sut.buttonStateFlow.value.onClick()
                 val previousRounds = sut.timerStateFlow.value.laps
@@ -612,7 +613,7 @@ class BreathingViewModelTest {
                 // Arrange
                 val timerListenerSlot = slot<CountUpTimer.Listener>()
                 mockkConstructor(CountUpTimerImpl::class)
-                justRun { anyConstructed<CountUpTimerImpl>().stop() }
+                every { anyConstructed<CountUpTimerImpl>().stop() } returns passedTime
                 justRun { anyConstructed<CountUpTimerImpl>().setListener(capture(timerListenerSlot)) }
                 val expectedExercise =
                     object : BreathingExercise {
@@ -633,7 +634,6 @@ class BreathingViewModelTest {
                         override var currenRoundIndex: Int = 0
                     }
                 every { getCurrentBreathingExerciseUseCase() } returns expectedExercise
-                every { anyConstructed<CountUpTimerImpl>().time } returns passedTime
                 sut = BreathingViewModel(getCurrentBreathingExerciseUseCase, testDispatcher)
                 // start timer and simulate time passed to trigger update of button state to next button
                 sut.buttonStateFlow.value.onClick()
@@ -655,7 +655,7 @@ class BreathingViewModelTest {
                 val timerListenerSlot = slot<CountUpTimer.Listener>()
                 val passedTime = 200L
                 mockkConstructor(CountUpTimerImpl::class)
-                justRun { anyConstructed<CountUpTimerImpl>().stop() }
+                every { anyConstructed<CountUpTimerImpl>().stop() } returns passedTime
                 justRun { anyConstructed<CountUpTimerImpl>().setListener(capture(timerListenerSlot)) }
                 justRun { anyConstructed<CountUpTimerImpl>().start() }
                 justRun { anyConstructed<CountUpTimerImpl>().removeListener(any()) }
@@ -679,7 +679,6 @@ class BreathingViewModelTest {
                         override var currenRoundIndex: Int = initialIndex
                     }
                 every { getCurrentBreathingExerciseUseCase() } returns expectedExercise
-                every { anyConstructed<CountUpTimerImpl>().time } returns passedTime
                 sut = BreathingViewModel(getCurrentBreathingExerciseUseCase, testDispatcher)
                 // start timer and simulate time passed to trigger update of button state to next button
                 sut.buttonStateFlow.value.onClick()
@@ -715,7 +714,7 @@ class BreathingViewModelTest {
             runTest {
                 val passedTime = 200L
                 mockkConstructor(CountUpTimerImpl::class)
-                justRun { anyConstructed<CountUpTimerImpl>().stop() }
+                every { anyConstructed<CountUpTimerImpl>().stop() } returns passedTime
                 val currentRound =
                     BreathingExercise.BreathingRound(
                         BreathingExercise.OPEN_TIMER,
@@ -729,7 +728,6 @@ class BreathingViewModelTest {
                         override var currenRoundIndex: Int = 0
                     }
                 every { getCurrentBreathingExerciseUseCase() } returns expectedExercise
-                every { anyConstructed<CountUpTimerImpl>().time } returns passedTime
                 sut = BreathingViewModel(getCurrentBreathingExerciseUseCase, testDispatcher)
                 // start timer and simulate time passed to trigger update of button state to next button
                 sut.buttonStateFlow.value.onClick()
@@ -748,7 +746,7 @@ class BreathingViewModelTest {
             runTest {
                 val passedTime = 200L
                 mockkConstructor(CountUpTimerImpl::class)
-                justRun { anyConstructed<CountUpTimerImpl>().stop() }
+                every { anyConstructed<CountUpTimerImpl>().stop() } returns passedTime
                 val currentRound =
                     BreathingExercise.BreathingRound(
                         BreathingExercise.OPEN_TIMER,
@@ -768,7 +766,6 @@ class BreathingViewModelTest {
                         override var currenRoundIndex: Int = 0
                     }
                 every { getCurrentBreathingExerciseUseCase() } returns expectedExercise
-                every { anyConstructed<CountUpTimerImpl>().time } returns passedTime
                 sut = BreathingViewModel(getCurrentBreathingExerciseUseCase, testDispatcher)
                 // start timer and simulate time passed to trigger update of button state to next button
                 sut.buttonStateFlow.value.onClick()
@@ -784,7 +781,7 @@ class BreathingViewModelTest {
             runTest {
                 val passedTime = 200L
                 mockkConstructor(CountUpTimerImpl::class)
-                justRun { anyConstructed<CountUpTimerImpl>().stop() }
+                every { anyConstructed<CountUpTimerImpl>().stop() } returns passedTime
                 val currentRound =
                     BreathingExercise.BreathingRound(
                         BreathingExercise.OPEN_TIMER,
@@ -804,7 +801,6 @@ class BreathingViewModelTest {
                         override var currenRoundIndex: Int = 0
                     }
                 every { getCurrentBreathingExerciseUseCase() } returns expectedExercise
-                every { anyConstructed<CountUpTimerImpl>().time } returns passedTime
                 sut = BreathingViewModel(getCurrentBreathingExerciseUseCase, testDispatcher)
                 // start timer and simulate time passed to trigger update of button state to next button
                 sut.buttonStateFlow.value.onClick()
@@ -826,7 +822,6 @@ class BreathingViewModelTest {
                 // Arrange
                 val timerListenerSlot = slot<CountUpTimer.Listener>()
                 mockkConstructor(CountUpTimerImpl::class)
-                justRun { anyConstructed<CountUpTimerImpl>().stop() }
                 justRun { anyConstructed<CountUpTimerImpl>().setListener(capture(timerListenerSlot)) }
                 justRun { anyConstructed<CountUpTimerImpl>().start() }
                 val currentRound =
@@ -849,17 +844,13 @@ class BreathingViewModelTest {
                         override var currenRoundIndex: Int = initialIndex
                     }
                 every { getCurrentBreathingExerciseUseCase() } returns expectedExercise
-                every { anyConstructed<CountUpTimerImpl>().time } returns endTime
                 sut = BreathingViewModel(getCurrentBreathingExerciseUseCase, testDispatcher)
                 // start timer and simulate time passed to trigger update of button state to next button
                 sut.buttonStateFlow.value.onClick()
-                sut.buttonStateFlow.test {
-                    awaitItem()
-                    // Act
-                    timerListenerSlot.captured.onTick(endTime)
-                    // Assert
-                    assertThat(awaitItem().text, `is`(Text.TextRes(R.string.btnNextText)))
-                }
+                // Act
+                timerListenerSlot.captured.onTick(endTime)
+                // Assert
+                assertThat(sut.buttonStateFlow.value.text, `is`(Text.TextRes(R.string.btnNextText)))
             }
 
         @ParameterizedTest
@@ -869,7 +860,6 @@ class BreathingViewModelTest {
                 // Arrange
                 val timerListenerSlot = slot<CountUpTimer.Listener>()
                 mockkConstructor(CountUpTimerImpl::class)
-                justRun { anyConstructed<CountUpTimerImpl>().stop() }
                 justRun { anyConstructed<CountUpTimerImpl>().setListener(capture(timerListenerSlot)) }
                 justRun { anyConstructed<CountUpTimerImpl>().start() }
                 val timerTime = endTime - 1
@@ -914,7 +904,6 @@ class BreathingViewModelTest {
                 // Arrange
                 val timerListenerSlot = slot<CountUpTimer.Listener>()
                 mockkConstructor(CountUpTimerImpl::class)
-                justRun { anyConstructed<CountUpTimerImpl>().stop() }
                 justRun { anyConstructed<CountUpTimerImpl>().setListener(capture(timerListenerSlot)) }
                 justRun { anyConstructed<CountUpTimerImpl>().start() }
                 val currentRound =
@@ -958,7 +947,6 @@ class BreathingViewModelTest {
                 // Arrange
                 val timerListenerSlot = slot<CountUpTimer.Listener>()
                 mockkConstructor(CountUpTimerImpl::class)
-                justRun { anyConstructed<CountUpTimerImpl>().stop() }
                 justRun { anyConstructed<CountUpTimerImpl>().setListener(capture(timerListenerSlot)) }
                 justRun { anyConstructed<CountUpTimerImpl>().start() }
                 val firstRound =
@@ -1001,7 +989,6 @@ class BreathingViewModelTest {
                 // Arrange
                 val timerListenerSlot = slot<CountUpTimer.Listener>()
                 mockkConstructor(CountUpTimerImpl::class)
-                justRun { anyConstructed<CountUpTimerImpl>().stop() }
                 justRun { anyConstructed<CountUpTimerImpl>().setListener(capture(timerListenerSlot)) }
                 justRun { anyConstructed<CountUpTimerImpl>().start() }
                 val firstRound =
@@ -1044,7 +1031,7 @@ class BreathingViewModelTest {
                 // Arrange
                 val timerListenerSlot = slot<CountUpTimer.Listener>()
                 mockkConstructor(CountUpTimerImpl::class)
-                justRun { anyConstructed<CountUpTimerImpl>().stop() }
+                every { anyConstructed<CountUpTimerImpl>().stop() } returns roundCount.toLong()
                 justRun { anyConstructed<CountUpTimerImpl>().setListener(capture(timerListenerSlot)) }
                 justRun { anyConstructed<CountUpTimerImpl>().start() }
                 val rounds = mutableListOf<BreathingExercise.BreathingRound>()
@@ -1073,14 +1060,13 @@ class BreathingViewModelTest {
                         override var currenRoundIndex: Int = 0
                     }
                 every { getCurrentBreathingExerciseUseCase() } returns expectedExercise
-                every { anyConstructed<CountUpTimerImpl>().time } returns roundCount.toLong()
                 sut = BreathingViewModel(getCurrentBreathingExerciseUseCase, testDispatcher)
                 // start timer and simulate time passed to trigger update of button state to next button
                 sut.buttonStateFlow.value.onClick()
                 // simulate all rounds except last one to be done
-                rounds.forEachIndexed { index, _ ->
+                rounds.forEachIndexed { index, round ->
                     if (index < rounds.lastIndex) {
-                        timerListenerSlot.captured.onFinish()
+                        timerListenerSlot.captured.onFinish(round.expectedTime)
                     }
                 }
                 // Act
@@ -1100,7 +1086,7 @@ class BreathingViewModelTest {
                 // Arrange
                 val listenerSlot = slot<CountUpTimer.Listener>()
                 mockkConstructor(CountUpTimerImpl::class)
-                justRun { anyConstructed<CountUpTimerImpl>().stop() }
+                every { anyConstructed<CountUpTimerImpl>().stop() } returns passedTime
                 justRun { anyConstructed<CountUpTimerImpl>().start() }
                 justRun { anyConstructed<CountUpTimerImpl>().setListener(capture(listenerSlot)) }
                 val expectedExercise =
@@ -1123,12 +1109,11 @@ class BreathingViewModelTest {
                     }
                 every { getCurrentBreathingExerciseUseCase() } returns expectedExercise
                 sut = BreathingViewModel(getCurrentBreathingExerciseUseCase, testDispatcher)
-                every { anyConstructed<CountUpTimerImpl>().time } returns passedTime
                 // start timer to get listener slot
                 sut.buttonStateFlow.value.onClick()
                 val previousRounds = sut.timerStateFlow.value.laps
                 // Act
-                listenerSlot.captured.onFinish()
+                listenerSlot.captured.onFinish(passedTime)
                 // Assert
                 val newRounds = sut.timerStateFlow.value.laps
                 assertThat(newRounds.size, `is`(previousRounds.size + 1))
@@ -1143,7 +1128,7 @@ class BreathingViewModelTest {
                 // Arrange
                 val timerListenerSlot = slot<CountUpTimer.Listener>()
                 mockkConstructor(CountUpTimerImpl::class)
-                justRun { anyConstructed<CountUpTimerImpl>().stop() }
+                every { anyConstructed<CountUpTimerImpl>().stop() } returns passedTime
                 justRun { anyConstructed<CountUpTimerImpl>().setListener(capture(timerListenerSlot)) }
                 val expectedExercise =
                     object : BreathingExercise {
@@ -1164,13 +1149,12 @@ class BreathingViewModelTest {
                         override var currenRoundIndex: Int = 0
                     }
                 every { getCurrentBreathingExerciseUseCase() } returns expectedExercise
-                every { anyConstructed<CountUpTimerImpl>().time } returns passedTime
                 sut = BreathingViewModel(getCurrentBreathingExerciseUseCase, testDispatcher)
                 // start timer
                 sut.buttonStateFlow.value.onClick()
                 val previousRounds = sut.timerStateFlow.value.laps
                 // Act
-                timerListenerSlot.captured.onFinish()
+                timerListenerSlot.captured.onFinish(passedTime)
                 // Assert
                 val newRounds = sut.timerStateFlow.value.laps
                 assertThat(newRounds.size, `is`(previousRounds.size + 1))
@@ -1185,7 +1169,6 @@ class BreathingViewModelTest {
                 val timerListenerSlot = slot<CountUpTimer.Listener>()
                 val passedTime = 200L
                 mockkConstructor(CountUpTimerImpl::class)
-                justRun { anyConstructed<CountUpTimerImpl>().stop() }
                 justRun { anyConstructed<CountUpTimerImpl>().setListener(capture(timerListenerSlot)) }
                 justRun { anyConstructed<CountUpTimerImpl>().start() }
                 justRun { anyConstructed<CountUpTimerImpl>().removeListener(any()) }
@@ -1209,14 +1192,13 @@ class BreathingViewModelTest {
                         override var currenRoundIndex: Int = initialIndex
                     }
                 every { getCurrentBreathingExerciseUseCase() } returns expectedExercise
-                every { anyConstructed<CountUpTimerImpl>().time } returns passedTime
                 sut = BreathingViewModel(getCurrentBreathingExerciseUseCase, testDispatcher)
                 // start timer
                 sut.buttonStateFlow.value.onClick()
                 // mockk constructor again to cancel old constructor mock and enable new constructor
                 mockkConstructor(CountUpTimerImpl::class)
                 // Act
-                timerListenerSlot.captured.onFinish()
+                timerListenerSlot.captured.onFinish(passedTime)
 
                 // Assert
                 assertThat(sut.timerStateFlow.value.type, `is`(nextRound.type))
@@ -1245,7 +1227,7 @@ class BreathingViewModelTest {
                 val passedTime = 200L
                 val listenerSlot = slot<CountUpTimer.Listener>()
                 mockkConstructor(CountUpTimerImpl::class)
-                justRun { anyConstructed<CountUpTimerImpl>().stop() }
+                every { anyConstructed<CountUpTimerImpl>().stop() } returns passedTime
                 justRun { anyConstructed<CountUpTimerImpl>().setListener(capture(listenerSlot)) }
                 val currentRound =
                     BreathingExercise.BreathingRound(
@@ -1260,12 +1242,11 @@ class BreathingViewModelTest {
                         override var currenRoundIndex: Int = 0
                     }
                 every { getCurrentBreathingExerciseUseCase() } returns expectedExercise
-                every { anyConstructed<CountUpTimerImpl>().time } returns passedTime
                 sut = BreathingViewModel(getCurrentBreathingExerciseUseCase, testDispatcher)
                 // start timer
                 sut.buttonStateFlow.value.onClick()
                 // Act
-                listenerSlot.captured.onFinish()
+                listenerSlot.captured.onFinish(passedTime)
 
                 // Assert
                 val timerState = sut.timerStateFlow.value
@@ -1280,7 +1261,7 @@ class BreathingViewModelTest {
                 val listenerSlot = slot<CountUpTimer.Listener>()
                 val passedTime = 200L
                 mockkConstructor(CountUpTimerImpl::class)
-                justRun { anyConstructed<CountUpTimerImpl>().stop() }
+                every { anyConstructed<CountUpTimerImpl>().stop() } returns passedTime
                 justRun { anyConstructed<CountUpTimerImpl>().setListener(capture(listenerSlot)) }
                 val currentRound =
                     BreathingExercise.BreathingRound(
@@ -1301,12 +1282,11 @@ class BreathingViewModelTest {
                         override var currenRoundIndex: Int = 0
                     }
                 every { getCurrentBreathingExerciseUseCase() } returns expectedExercise
-                every { anyConstructed<CountUpTimerImpl>().time } returns passedTime
                 sut = BreathingViewModel(getCurrentBreathingExerciseUseCase, testDispatcher)
                 // start timer
                 sut.buttonStateFlow.value.onClick()
                 // Act
-                listenerSlot.captured.onFinish()
+                listenerSlot.captured.onFinish(passedTime)
 
                 // Assert
                 assertThat(sut.buttonStateFlow.value.text, `is`(Text.TextRes(R.string.btnNextText)))
@@ -1318,7 +1298,7 @@ class BreathingViewModelTest {
                 val passedTime = 200L
                 val listenerSlot = slot<CountUpTimer.Listener>()
                 mockkConstructor(CountUpTimerImpl::class)
-                justRun { anyConstructed<CountUpTimerImpl>().stop() }
+                every { anyConstructed<CountUpTimerImpl>().stop() } returns passedTime
                 justRun { anyConstructed<CountUpTimerImpl>().setListener(capture(listenerSlot)) }
                 val currentRound =
                     BreathingExercise.BreathingRound(
@@ -1339,12 +1319,11 @@ class BreathingViewModelTest {
                         override var currenRoundIndex: Int = 0
                     }
                 every { getCurrentBreathingExerciseUseCase() } returns expectedExercise
-                every { anyConstructed<CountUpTimerImpl>().time } returns passedTime
                 sut = BreathingViewModel(getCurrentBreathingExerciseUseCase, testDispatcher)
                 // start timer
                 sut.buttonStateFlow.value.onClick()
                 // Act
-                listenerSlot.captured.onFinish()
+                listenerSlot.captured.onFinish(passedTime)
 
                 // Assert
                 assertThat(sut.buttonStateFlow.value.text, `is`(Text.TextRes(R.string.btnPauseText)))
@@ -1360,7 +1339,7 @@ class BreathingViewModelTest {
                 // Arrange
                 mockkConstructor(CountUpTimerImpl::class)
                 justRun { anyConstructed<CountUpTimerImpl>().start() }
-                justRun { anyConstructed<CountUpTimerImpl>().stop() }
+                every { anyConstructed<CountUpTimerImpl>().stop() } returns 0L
                 justRun { anyConstructed<CountUpTimerImpl>().removeListener(any()) }
                 val currentRound =
                     BreathingExercise.BreathingRound(
@@ -1424,4 +1403,85 @@ class BreathingViewModelTest {
                 assertThat(true, `is`(true))
             }
     }
+
+    @Test
+    fun `37- When pause button state clicked, then call pause on timer and show resume button state`() =
+        runTest {
+            // Arrange
+            mockkConstructor(CountUpTimerImpl::class)
+            justRun { anyConstructed<CountUpTimerImpl>().pause() }
+            val expectedExercise =
+                object : BreathingExercise {
+                    override val title: Text = Text.TextRes(R.string.buteyko_breathing_title)
+                    override val rounds: List<BreathingExercise.BreathingRound> =
+                        listOf(
+                            BreathingExercise.BreathingRound(
+                                1000L,
+                                BreathingExercise.RoundType.NORMAL_BREATHING,
+                                false,
+                            ),
+                            BreathingExercise.BreathingRound(
+                                1000L,
+                                BreathingExercise.RoundType.LOWER_BREATHING,
+                                true,
+                            ),
+                        )
+                    override var currenRoundIndex: Int = 0
+                }
+            every { getCurrentBreathingExerciseUseCase() } returns expectedExercise
+            sut = BreathingViewModel(getCurrentBreathingExerciseUseCase, testDispatcher)
+            // trigger pause button shown
+            sut.buttonStateFlow.value.onClick.invoke()
+            sut.buttonStateFlow.test {
+                // catch initial state
+                awaitItem()
+                // Act
+                sut.buttonStateFlow.value.onClick.invoke()
+                // Assert
+                assertThat(awaitItem().text, `is`(Text.TextRes(R.string.btnResumeText)))
+                verify { anyConstructed<CountUpTimerImpl>().pause() }
+            }
+        }
+
+    @Test
+    fun `38- When resume button state clicked, then call resume on timer and show pause button state`() =
+        runTest {
+            // Arrange
+            mockkConstructor(CountUpTimerImpl::class)
+            justRun { anyConstructed<CountUpTimerImpl>().pause() }
+            justRun { anyConstructed<CountUpTimerImpl>().resume() }
+            val expectedExercise =
+                object : BreathingExercise {
+                    override val title: Text = Text.TextRes(R.string.buteyko_breathing_title)
+                    override val rounds: List<BreathingExercise.BreathingRound> =
+                        listOf(
+                            BreathingExercise.BreathingRound(
+                                1000L,
+                                BreathingExercise.RoundType.NORMAL_BREATHING,
+                                false,
+                            ),
+                            BreathingExercise.BreathingRound(
+                                1000L,
+                                BreathingExercise.RoundType.LOWER_BREATHING,
+                                true,
+                            ),
+                        )
+                    override var currenRoundIndex: Int = 0
+                }
+            every { getCurrentBreathingExerciseUseCase() } returns expectedExercise
+            sut = BreathingViewModel(getCurrentBreathingExerciseUseCase, testDispatcher)
+            // trigger pause button shown
+            sut.buttonStateFlow.value.onClick.invoke()
+            // pause to trigger resume button shown
+            sut.buttonStateFlow.value.onClick.invoke()
+            sut.buttonStateFlow.test {
+                // catch initial state
+                awaitItem()
+                // Act
+                sut.buttonStateFlow.value.onClick.invoke()
+                // Assert
+                assertThat(awaitItem().text, `is`(Text.TextRes(R.string.btnPauseText)))
+                verify { anyConstructed<CountUpTimerImpl>().resume() }
+            }
+        }
 }

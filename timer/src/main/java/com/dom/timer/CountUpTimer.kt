@@ -5,7 +5,11 @@ interface CountUpTimer {
 
     fun start()
 
-    fun stop()
+    fun pause()
+
+    fun resume()
+
+    fun stop(): Long
 
     fun setListener(listener: Listener)
 
@@ -14,7 +18,7 @@ interface CountUpTimer {
     interface Listener {
         fun onTick(time: Long)
 
-        fun onFinish() {}
+        fun onFinish(trackedTime: Long) {}
     }
 
     companion object {

@@ -37,8 +37,8 @@ class BreathingViewModel
                     this@BreathingViewModel.onTick(time)
                 }
 
-                override fun onFinish() {
-                    this@BreathingViewModel.onFinish()
+                override fun onFinish(trackedTime: Long) {
+                    this@BreathingViewModel.onFinish(trackedTime)
                 }
             }
         // endregion
@@ -76,11 +76,18 @@ class BreathingViewModel
 
         private fun onNextClicked() {
             // clear potentially running timers:
-            timer?.stop()
-            onFinish()
+            val trackedTime = timer?.stop() ?: 0L
+            onFinish(trackedTime)
         }
 
         private fun onPauseClicked() {
+            timer?.pause()
+            _buttonStateFlow.value = ButtonState(Text.TextRes(R.string.btnResumeText), ::onResumeClicked)
+        }
+
+        private fun onResumeClicked() {
+            _buttonStateFlow.value = ButtonState(Text.TextRes(R.string.btnPauseText), ::onPauseClicked)
+            timer?.resume()
         }
         // endregion
 
@@ -88,7 +95,7 @@ class BreathingViewModel
         private fun onTick(time: Long) {
             // show next button if not open timer but next round needs to be started by user
             if (currentRound.expectedTime != OPEN_TIMER && time >= currentRound.expectedTime) {
-                updateButtonState()
+                updateButtonState(trackedTime = time)
             }
             val progress =
                 if (currentRound.expectedTime > 0) {
@@ -106,8 +113,8 @@ class BreathingViewModel
                 )
         }
 
-        private fun onFinish() {
-            updateRoundsData()
+        private fun onFinish(trackedTime: Long) {
+            updateRoundsData(trackedTime)
             timer?.stop()
             val hasNextRoundBeforeChanging = currentExercise.currenRoundIndex < currentExercise.rounds.lastIndex
             if (hasNextRoundBeforeChanging) {
@@ -124,30 +131,30 @@ class BreathingViewModel
                         currentTimeText = STARTING_TIME_STRING,
                     )
             }
-            updateButtonState(hasNextRoundBeforeChanging, !hasNextRoundBeforeChanging)
+            updateButtonState(hasNextRoundBeforeChanging, !hasNextRoundBeforeChanging, trackedTime)
         }
         // endregion
 
         private fun updateButtonState(
             isNewRound: Boolean = false,
             isDone: Boolean = false,
+            trackedTime: Long? = null,
         ) {
             _buttonStateFlow.value =
-                getButtonState(isNewRound, isDone)
+                getButtonState(isNewRound, isDone, trackedTime)
         }
 
         private fun getButtonState(
             isNewRound: Boolean,
             isDone: Boolean,
+            trackedTime: Long? = null,
         ): ButtonState {
             val isOpenTimer = currentRound.expectedTime == OPEN_TIMER && !isDone
-            val isExpectedTimeDone = isOpenTimer || (!isNewRound && (timer?.time ?: Long.MAX_VALUE) >= currentRound.expectedTime)
-
+            val isExpectedTimeDone = isOpenTimer || (!isNewRound && (trackedTime ?: Long.MAX_VALUE) >= currentRound.expectedTime)
             return when {
                 // Timer was not started
-                timer == null && currentExercise.currenRoundIndex == 0 -> {
+                timer == null && currentExercise.currenRoundIndex == 0 ->
                     ButtonState(Text.TextRes(R.string.btnStartText), ::onStartClicked)
-                }
 
                 // TODO: handle timer was started but canceled
 
@@ -198,10 +205,10 @@ class BreathingViewModel
             return previousRounds.filterIndexed { index, _ -> index < currentExercise.currenRoundIndex }.sum()
         }
 
-        private fun updateRoundsData() {
+        private fun updateRoundsData(trackedTime: Long) {
             val newRound =
                 if (currentRound.expectedTime == OPEN_TIMER || (currentExercise.hasNextRound && !currentExercise.doesNextRoundStartAutomatically)) {
-                    timer?.time ?: 0L
+                    trackedTime
                 } else {
                     currentRound.expectedTime
                 }

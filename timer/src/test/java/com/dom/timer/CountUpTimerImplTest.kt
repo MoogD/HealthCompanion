@@ -4,6 +4,7 @@ import com.dom.testUtils.TestDispatcherProvider
 import com.dom.utils.DispatchersProvider
 import com.dom.utils.DispatchersProviderImpl
 import io.mockk.clearAllMocks
+import io.mockk.clearMocks
 import io.mockk.coJustRun
 import io.mockk.coVerify
 import io.mockk.every
@@ -54,17 +55,29 @@ class CountUpTimerImplTest {
     // 16- When start is called, given startTimeInMillis > 0 provided and endTimeInMillis provided with endTimeInMillis > startTimeInMilli, then start timer beginning with startTimeInMillis
     // 17- When start is called, given endTimeInMillis and listener is set provided, then call onFinish after timer is stopped
     // 18- When start is called, given listener is set but no endTimeInMillis provided, then don't call onFinish
+    // 19- When start is called, given timer was active before, then start with correct startTime
 
-    // 19- When timer is active, then time variable is updated
-    // 20- When timer is active, given listener was set, then onTick is called with correct time variable once every periodInMillis passed
-    // 21- When timer is active, given endTime is reached and no listener is set, then just end timer
+    // 20- When timer is active, then time variable is updated
+    // 21- When timer is active, given listener was set, then onTick is called with correct time variable once every periodInMillis passed
+    // 22- When timer is active, given endTime is reached and no listener is set, then just end timer
 
-    // 22- When setListener is called, then provided listener is notified about future events
-    // 23- When setListener is called, given there was already a listener set, then the old listener is not notified about future events
+    // 23- When setListener is called, then provided listener is notified about future events
+    // 24- When setListener is called, given there was already a listener set, then the old listener is not notified about future events
 
-    // 24- When removeListener is called, given there is no listener, then nothing happens
-    // 25- When removeListener is called, given there was a listener, then listener is not notified about future events
+    // 25- When removeListener is called, given there is no listener, then nothing happens
+    // 26- When removeListener is called, given there was a listener, then listener is not notified about future events
 
+    // 27- When pause is called, given timer was active, then stop timer
+    // 28- When pause is called, given timer was not active, then nothing happens
+
+    // 29- When resume is called, given timer was paused before, then restart timer with time from paused
+    // 30- When resume is called, given timer was active, then timer keeps running
+    // 31- When resume is called, given timer was never started, then start timer
+    // 32- When resume is called, given timer was stopped, then start timer
+
+    // 33- When stop is called, then stop timer and return tracked time
+    // 34- When stop is called, given timer was active before and startTimeInMillis was provided, then reset tracked time variable to startTimeInMillis
+    // 35- When stop is called, given timer was active before and startTimeInMillis was not provided, then reset tracked time variable to 0
     // endregion
 
     private val testDispatcherProvider = TestDispatcherProvider()
@@ -407,7 +420,7 @@ class CountUpTimerImplTest {
                 sut.start()
                 // Assert
                 advanceTimeBy(endTime + 10)
-                coVerify(exactly = 1) { mockListener.onFinish() }
+                coVerify(exactly = 1) { mockListener.onFinish(endTime) }
                 // check that timer task is not active
                 assertThat(backgroundScope.coroutineContext.job.children.all { it.isCancelled }, `is`(true))
             }
@@ -431,9 +444,36 @@ class CountUpTimerImplTest {
                 sut.start()
                 // Assert
                 advanceTimeBy(10000)
-                coVerify(exactly = 0) { mockListener.onFinish() }
+                coVerify(exactly = 0) { mockListener.onFinish(any()) }
                 // check that timer task is still active
                 assertThat(backgroundScope.coroutineContext.job.children.all { it.isCancelled }, `is`(false))
+            }
+
+        @ParameterizedTest
+        @ValueSource(longs = [0, 1, 2, 10, 1213])
+        fun `19- given timer was active before, then start with correct startTime`(startTimeInMillis: Long) =
+            runTest {
+                // Arrange
+                // mock scope to run timer job in background of test coroutine scope
+                mockkStatic(::CoroutineScope)
+                every { CoroutineScope(any()) } returns backgroundScope
+                val spendTime = if (startTimeInMillis > 0) 5 * startTimeInMillis else 5
+                sut =
+                    CountUpTimerImpl(
+                        periodInMillis = 1,
+                        startTimeInMillis = startTimeInMillis,
+                        dispatchersProvider = testDispatcherProvider,
+                    )
+                sut.setListener(mockListener)
+                sut.start()
+                advanceTimeBy(spendTime)
+                clearMocks(mockListener, answers = false)
+                // Act
+                sut.start()
+                // Assert
+                advanceTimeBy(spendTime)
+                coVerify(exactly = 0) { mockListener.onTick(or(less(startTimeInMillis), eq(startTimeInMillis))) }
+                coVerify { mockListener.onTick(more(startTimeInMillis)) }
             }
     }
 
@@ -443,7 +483,7 @@ class CountUpTimerImplTest {
         @OptIn(ExperimentalCoroutinesApi::class)
         @ParameterizedTest
         @ValueSource(ints = [1, 2, 3, 4, 5, 10])
-        fun `19- then time variable is updated`(rounds: Int) =
+        fun `20- then time variable is updated`(rounds: Int) =
             runTest {
                 // Arrange
                 val periodInMillis = 100L
@@ -468,7 +508,7 @@ class CountUpTimerImplTest {
         @OptIn(ExperimentalCoroutinesApi::class)
         @ParameterizedTest
         @ValueSource(ints = [1, 2, 3, 4, 5, 10])
-        fun `20- given listener was set, then onTick is called with correct time variable once every periodInMillis passed`(rounds: Int) =
+        fun `21- given listener was set, then onTick is called with correct time variable once every periodInMillis passed`(rounds: Int) =
             runTest {
                 // Arrange
                 val periodInMillis = 100L
@@ -493,7 +533,7 @@ class CountUpTimerImplTest {
 
         @OptIn(ExperimentalCoroutinesApi::class)
         @Test
-        fun `21- given endTime is reached and no listener is set, then just end timer`() =
+        fun `22- given endTime is reached and no listener is set, then just end timer`() =
             runTest {
                 // Arrange
                 val endTimeInMillis = 2 * CountUpTimer.DEFAULT_PERIOD
@@ -510,7 +550,6 @@ class CountUpTimerImplTest {
                 sut.start()
                 // Assert
                 advanceTimeBy(2 * endTimeInMillis)
-                assertThat(sut.time, `is`(endTimeInMillis))
                 // check timer not running
                 assertThat(backgroundScope.coroutineContext.job.children.all { it.isCancelled }, `is`(true))
             }
@@ -522,7 +561,7 @@ class CountUpTimerImplTest {
         @OptIn(ExperimentalCoroutinesApi::class)
         @ParameterizedTest
         @ValueSource(ints = [2, 3, 4, 5, 10])
-        fun `22- then provided listener is notified about future events`(rounds: Int) =
+        fun `23- then provided listener is notified about future events`(rounds: Int) =
             runTest {
                 // Arrange
                 // mock scope to run timer job in background of test coroutine scope
@@ -541,13 +580,13 @@ class CountUpTimerImplTest {
                     verify { mockListener.onTick(CountUpTimer.DEFAULT_PERIOD * i) }
                 }
                 advanceTimeBy(CountUpTimer.DEFAULT_PERIOD + 2)
-                coVerify { mockListener.onFinish() }
+                coVerify { mockListener.onFinish(endTime) }
             }
 
         @OptIn(ExperimentalCoroutinesApi::class)
         @ParameterizedTest
         @ValueSource(ints = [2, 3, 4, 5, 10])
-        fun `23- given there was already a listener set, then the old listener is not notified about future events`(rounds: Int) =
+        fun `24- given there was already a listener set, then the old listener is not notified about future events`(rounds: Int) =
             runTest {
                 // Arrange
                 // mock scope to run timer job in background of test coroutine scope
@@ -568,9 +607,9 @@ class CountUpTimerImplTest {
                     verify { mockListener.onTick(CountUpTimer.DEFAULT_PERIOD * i) }
                 }
                 advanceTimeBy(CountUpTimer.DEFAULT_PERIOD + 2)
-                coVerify { mockListener.onFinish() }
+                coVerify { mockListener.onFinish(endTime) }
                 coVerify(exactly = 0) { oldListener.onTick(any()) }
-                coVerify(exactly = 0) { oldListener.onFinish() }
+                coVerify(exactly = 0) { oldListener.onFinish(any()) }
             }
     }
 
@@ -578,7 +617,7 @@ class CountUpTimerImplTest {
     @DisplayName("When removeListener is called")
     inner class RemoveListener {
         @Test
-        fun `24- given there is no listener, then nothing happens`() {
+        fun `25- given there is no listener, then nothing happens`() {
             // Arrange
             sut = CountUpTimerImpl()
             // Act
@@ -589,7 +628,7 @@ class CountUpTimerImplTest {
 
         @OptIn(ExperimentalCoroutinesApi::class)
         @Test
-        fun `25- given there was a listener, then listener is not notified about future events`() =
+        fun `26- given there was a listener, then listener is not notified about future events`() =
             runTest {
                 // Arrange
                 val endTime = 1000L
@@ -602,7 +641,254 @@ class CountUpTimerImplTest {
                 sut.start()
                 advanceTimeBy(2 * endTime)
                 verify(exactly = 0) { mockListener.onTick(any()) }
-                verify(exactly = 0) { mockListener.onFinish() }
+                verify(exactly = 0) { mockListener.onFinish(any()) }
+            }
+    }
+
+    @Nested
+    @DisplayName("When pause is called")
+    inner class Pause {
+        @OptIn(ExperimentalCoroutinesApi::class)
+        @Test
+        fun `27- given timer was active, then stop timer`() =
+            runTest {
+                // Arrange
+                // mock scope to run timer job in background of test coroutine scope
+                mockkStatic(::CoroutineScope)
+                every { CoroutineScope(any()) } returns backgroundScope
+
+                sut =
+                    CountUpTimerImpl(
+                        periodInMillis = 1,
+                        dispatchersProvider = testDispatcherProvider,
+                    )
+                sut.setListener(mockListener)
+                sut.start()
+                advanceTimeBy(1000)
+                clearMocks(mockListener, answers = false)
+                // Act
+                sut.pause()
+                // Assert
+                assertThat(backgroundScope.coroutineContext.job.children.all { it.isCancelled }, `is`(true))
+                advanceTimeBy(1000)
+                coVerify(exactly = 0) { mockListener.onTick(any<Long>()) }
+            }
+
+        @Test
+        fun `28- given timer was not active, then nothing happens`() =
+            runTest {
+                // Arrange
+                // mock scope to run timer job in background of test coroutine scope
+                mockkStatic(::CoroutineScope)
+                every { CoroutineScope(any()) } returns backgroundScope
+                sut =
+                    CountUpTimerImpl(
+                        periodInMillis = 1,
+                        dispatchersProvider = testDispatcherProvider,
+                    )
+                // Act
+                sut.pause()
+                // Assert
+                assertThat(backgroundScope.coroutineContext.job.children.all { it.isCancelled }, `is`(true))
+            }
+    }
+
+    @Nested
+    @DisplayName("When resume is called")
+    inner class Resume {
+        @OptIn(ExperimentalCoroutinesApi::class)
+        @ParameterizedTest
+        @ValueSource(longs = [0, 1, 5, 10, 20, 30, 33, 3234])
+        fun `29- given timer was paused before, then restart timer with time from paused`(trackedTime: Long) =
+            runTest {
+                // Arrange
+                // mock scope to run timer job in background of test coroutine scope
+                mockkStatic(::CoroutineScope)
+                every { CoroutineScope(any()) } returns backgroundScope
+
+                sut =
+                    CountUpTimerImpl(
+                        periodInMillis = 1,
+                        dispatchersProvider = testDispatcherProvider,
+                    )
+                sut.setListener(mockListener)
+                sut.start()
+                advanceTimeBy(trackedTime)
+                sut.pause()
+                val pausedTime = sut.time
+                clearMocks(mockListener, answers = false)
+                // Act
+                sut.resume()
+                // Assert
+                advanceTimeBy(1000)
+                coVerify { mockListener.onTick(more(pausedTime)) }
+                coVerify(exactly = 0) { mockListener.onTick(or(less(pausedTime), eq(pausedTime))) }
+            }
+
+        @OptIn(ExperimentalCoroutinesApi::class)
+        @ParameterizedTest
+        @ValueSource(longs = [0, 1, 5, 10, 20, 30, 33, 3234])
+        fun `30- given timer was active, then timer keeps running`(trackedTime: Long) =
+            runTest {
+                // Arrange
+                // mock scope to run timer job in background of test coroutine scope
+                mockkStatic(::CoroutineScope)
+                every { CoroutineScope(any()) } returns backgroundScope
+
+                sut =
+                    CountUpTimerImpl(
+                        periodInMillis = 1,
+                        dispatchersProvider = testDispatcherProvider,
+                    )
+                sut.setListener(mockListener)
+                sut.start()
+                advanceTimeBy(trackedTime)
+                clearMocks(mockListener, answers = false)
+                // Act
+                sut.resume()
+                // Assert
+                advanceTimeBy(100)
+                coVerify { mockListener.onTick(more(trackedTime)) }
+                coVerify(exactly = 0) { mockListener.onTick(less(trackedTime)) }
+                assertThat(backgroundScope.coroutineContext.job.children.all { it.isCancelled }, `is`(false))
+            }
+
+        @OptIn(ExperimentalCoroutinesApi::class)
+        @Test
+        fun `31- given timer was never started, then start timer`() =
+            runTest {
+                // Arrange
+                // mock scope to run timer job in background of test coroutine scope
+                mockkStatic(::CoroutineScope)
+                every { CoroutineScope(any()) } returns backgroundScope
+                sut =
+                    CountUpTimerImpl(
+                        periodInMillis = 1,
+                        dispatchersProvider = testDispatcherProvider,
+                    )
+                sut.setListener(mockListener)
+                // Act
+                sut.resume()
+                // Assert
+                val spendTime = 100L
+                advanceTimeBy(spendTime)
+                coVerify { mockListener.onTick(1) }
+            }
+
+        @OptIn(ExperimentalCoroutinesApi::class)
+        @Test
+        fun `32- given timer was stopped, then start timer`() =
+            runTest {
+                // Arrange
+                // mock scope to run timer job in background of test coroutine scope
+                mockkStatic(::CoroutineScope)
+                every { CoroutineScope(any()) } returns backgroundScope
+
+                sut =
+                    CountUpTimerImpl(
+                        periodInMillis = 1,
+                        dispatchersProvider = testDispatcherProvider,
+                    )
+                sut.setListener(mockListener)
+                sut.start()
+                advanceTimeBy(1000)
+                sut.stop()
+                clearMocks(mockListener, answers = false)
+                // Act
+                sut.resume()
+                // Assert
+                val spendTime = 100L
+                advanceTimeBy(spendTime)
+                coVerify { mockListener.onTick(1) }
+                coVerify(exactly = 0) { mockListener.onFinish(any()) }
+            }
+    }
+
+    @Nested
+    @DisplayName("When stop is called")
+    inner class Stop {
+        @OptIn(ExperimentalCoroutinesApi::class)
+        @ParameterizedTest
+        @ValueSource(longs = [0, 1, 5, 10, 20, 30, 33, 3234])
+        fun `33- then stop timer and return tracked time`(time: Long) =
+            runTest {
+                // Arrange
+                // mock scope to run timer job in background of test coroutine scope
+                mockkStatic(::CoroutineScope)
+                every { CoroutineScope(any()) } returns backgroundScope
+
+                sut =
+                    CountUpTimerImpl(
+                        periodInMillis = 1,
+                        dispatchersProvider = testDispatcherProvider,
+                    )
+                sut.setListener(mockListener)
+                sut.start()
+                advanceTimeBy(time)
+                // need to take the time variable since advanceTimeBy time might not fit to the period tracked due to delays with running code
+                val trackedTime = sut.time
+                clearMocks(mockListener, answers = false)
+                // Act
+                val stoppedTime = sut.stop()
+                // Assert
+                advanceTimeBy(1000)
+                coVerify(exactly = 0) { mockListener.onTick(any()) }
+                assertThat(stoppedTime, `is`(trackedTime))
+                assertThat(backgroundScope.coroutineContext.job.children.all { it.isCancelled }, `is`(true))
+            }
+
+        @OptIn(ExperimentalCoroutinesApi::class)
+        @ParameterizedTest
+        @ValueSource(longs = [0, 1, 5, 10, 20, 30, 33, 3234])
+        fun `34- given timer was active before and startTimeInMillis was provided, then reset tracked time variable to startTimeInMillis`(startTimeInMillis: Long) =
+            runTest {
+                // Arrange
+                // mock scope to run timer job in background of test coroutine scope
+                mockkStatic(::CoroutineScope)
+                every { CoroutineScope(any()) } returns backgroundScope
+
+                sut =
+                    CountUpTimerImpl(
+                        periodInMillis = 1,
+                        startTimeInMillis = startTimeInMillis,
+                        dispatchersProvider = testDispatcherProvider,
+                    )
+                sut.setListener(mockListener)
+                sut.start()
+                advanceTimeBy(10_000)
+                clearMocks(mockListener, answers = false)
+                // Act
+                sut.stop()
+                // Assert
+                advanceTimeBy(1000)
+                assertThat(sut.time, `is`(startTimeInMillis))
+                assertThat(backgroundScope.coroutineContext.job.children.all { it.isCancelled }, `is`(true))
+            }
+
+        @OptIn(ExperimentalCoroutinesApi::class)
+        @Test
+        fun `35- given timer was active before and startTimeInMillis was not provided, then reset tracked time variable to 0`() =
+            runTest {
+                // Arrange
+                // mock scope to run timer job in background of test coroutine scope
+                mockkStatic(::CoroutineScope)
+                every { CoroutineScope(any()) } returns backgroundScope
+
+                sut =
+                    CountUpTimerImpl(
+                        periodInMillis = 1,
+                        dispatchersProvider = testDispatcherProvider,
+                    )
+                sut.setListener(mockListener)
+                sut.start()
+                advanceTimeBy(10_000)
+                clearMocks(mockListener, answers = false)
+                // Act
+                sut.stop()
+                // Assert
+                advanceTimeBy(1000)
+                assertThat(sut.time, `is`(0))
+                assertThat(backgroundScope.coroutineContext.job.children.all { it.isCancelled }, `is`(true))
             }
     }
 

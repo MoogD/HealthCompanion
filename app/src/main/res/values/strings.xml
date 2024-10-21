@@ -9,4 +9,5 @@
     <string name="btnStopText">Stop</string>
     <string name="btnPauseText">Pause</string>
     <string name="btnNextText">Next</string>
+    <string name="btnResumeText">Resume</string>
 </resources>

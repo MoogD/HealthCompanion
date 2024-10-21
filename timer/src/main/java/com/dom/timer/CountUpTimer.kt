@@ -18,7 +18,7 @@ interface CountUpTimer {
     interface Listener {
         fun onTick(time: Long)
 
-        fun onFinish(trackedTime: Long) {}
+        fun onFinish(trackedTime: Long)
     }
 
     companion object {

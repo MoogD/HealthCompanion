@@ -68,6 +68,7 @@ dependencies {
     // internal modules
     implementation(project(":timer"))
     implementation(project(":utils"))
+    implementation(project(":android-utils"))
     testImplementation(project(":test-utils"))
 
     implementation(libs.androidx.core.ktx)
@@ -112,6 +113,7 @@ dependencies {
     // kover report
     kover(project(":timer"))
     kover(project(":utils"))
+    kover(project(":android-utils"))
 }
 mockposable {
     plugins = listOf("mockk", "compose-ui")

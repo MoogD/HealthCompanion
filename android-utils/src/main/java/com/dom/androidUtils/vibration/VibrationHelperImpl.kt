@@ -1,4 +1,4 @@
-package com.dom.androidUtils
+package com.dom.androidUtils.vibration
 
 import android.content.Context
 import android.os.Build

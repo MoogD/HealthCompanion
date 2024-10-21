@@ -3,7 +3,9 @@ package com.dom.androidUtils
 import android.content.Context
 import android.os.VibrationEffect
 import android.os.Vibrator
-import com.dom.androidUtils.VibrationHelperImpl.Companion.DEFAULT_DURATION
+import com.dom.androidUtils.vibration.VibrationHelperImpl.Companion.DEFAULT_DURATION
+import com.dom.androidUtils.vibration.VibrationHelper
+import com.dom.androidUtils.vibration.VibrationHelperImpl
 import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.justRun

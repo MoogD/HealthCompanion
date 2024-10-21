@@ -1,4 +1,4 @@
-package com.dom.androidUtils
+package com.dom.androidUtils.vibration
 
 interface VibrationHelper {
     fun vibrate(type: VibrationType)

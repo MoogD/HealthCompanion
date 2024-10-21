@@ -1,6 +1,7 @@
 package com.dom.healthcompanion.ui.breathing
 
 import androidx.lifecycle.ViewModel
+import com.dom.androidUtils.VibrationHelper
 import com.dom.healthcompanion.R
 import com.dom.healthcompanion.domain.breathing.model.BreathingExercise
 import com.dom.healthcompanion.domain.breathing.usecase.GetCurrentBreathingExerciseUseCase
@@ -23,6 +24,7 @@ class BreathingViewModel
     constructor(
         private val getCurrentBreathingExerciseUseCase: GetCurrentBreathingExerciseUseCase,
         private val dispatchersProvider: DispatchersProvider,
+        private val vibrationHelper: VibrationHelper,
     ) : ViewModel() {
         // region variables
         private var currentExercise: BreathingExercise = getCurrentBreathingExerciseUseCase()
@@ -39,6 +41,7 @@ class BreathingViewModel
 
                 override fun onFinish(trackedTime: Long) {
                     this@BreathingViewModel.onFinish(trackedTime)
+                    vibrationHelper.vibrate(VibrationHelper.VibrationType.NOTIFY_USER)
                 }
             }
         // endregion
@@ -94,8 +97,10 @@ class BreathingViewModel
         // region timer functions
         private fun onTick(time: Long) {
             // show next button if not open timer but next round needs to be started by user
-            if (currentRound.expectedTime != OPEN_TIMER && time >= currentRound.expectedTime) {
+            val isNextButtonShown = (_buttonStateFlow.value.text as Text.TextRes).resId == R.string.btnNextText
+            if (!isNextButtonShown && currentRound.expectedTime != OPEN_TIMER && time >= currentRound.expectedTime) {
                 updateButtonState(trackedTime = time)
+                vibrationHelper.vibrate(VibrationHelper.VibrationType.NOTIFY_USER)
             }
             val progress =
                 if (currentRound.expectedTime > 0) {

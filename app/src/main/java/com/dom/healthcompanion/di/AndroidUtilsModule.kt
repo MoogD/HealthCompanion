@@ -1,8 +1,10 @@
 package com.dom.healthcompanion.di
 
 import android.content.Context
-import com.dom.androidUtils.VibrationHelper
-import com.dom.androidUtils.VibrationHelperImpl
+import com.dom.androidUtils.sound.SoundPlayer
+import com.dom.androidUtils.sound.SoundPlayerImpl
+import com.dom.androidUtils.vibration.VibrationHelper
+import com.dom.androidUtils.vibration.VibrationHelperImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -17,5 +19,12 @@ object AndroidUtilsModule {
         @ApplicationContext context: Context,
     ): VibrationHelper {
         return VibrationHelperImpl(context)
+    }
+
+    @Provides
+    fun provideSoundPlayer(
+        @ApplicationContext context: Context,
+    ): SoundPlayer {
+        return SoundPlayerImpl(context)
     }
 }

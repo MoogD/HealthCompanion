@@ -449,6 +449,7 @@ class CountUpTimerImplTest {
                 assertThat(backgroundScope.coroutineContext.job.children.all { it.isCancelled }, `is`(false))
             }
 
+        @OptIn(ExperimentalCoroutinesApi::class)
         @ParameterizedTest
         @ValueSource(longs = [0, 1, 2, 10, 1213])
         fun `19- given timer was active before, then start with correct startTime`(startTimeInMillis: Long) =

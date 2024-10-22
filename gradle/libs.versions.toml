@@ -72,3 +72,4 @@ ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "jetbrainsKotlinJvm" }
 kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kover" }
 mockposable = { id = "com.jeppeman.mockposable", version.ref = "mockposable"}
+android-library = { id = "com.android.library", version.ref = "agp" }

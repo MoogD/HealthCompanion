@@ -12,7 +12,7 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:name=".ui.HealthCompanionApplication"
+        android:name=".HealthCompanionApplication"
         android:theme="@style/Theme.HealthCompanion"
         tools:targetApi="31">
         <activity

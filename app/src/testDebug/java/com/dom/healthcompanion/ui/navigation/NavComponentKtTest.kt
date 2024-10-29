@@ -5,6 +5,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.compose.ComposeNavigator
 import androidx.navigation.testing.TestNavHostController
+import com.dom.logger.Logger
 import io.mockk.clearMocks
 import io.mockk.every
 import io.mockk.justRun
@@ -40,6 +41,7 @@ class NavComponentKtTest {
 
     private lateinit var navController: TestNavHostController
     private val mockNavigator = mockk<Navigator>()
+    private val logger = mockk<Logger>(relaxed = true)
     private val navTargetFlow = MutableSharedFlow<NavItem>(extraBufferCapacity = 1)
 
     // Create spyk to test correct navigation route invoked without actually calling the connected composable (to avoid issues with hiltViewModel call)
@@ -53,7 +55,7 @@ class NavComponentKtTest {
         composeTestRule.setContent {
             navController = TestNavHostController(LocalContext.current)
             navController.navigatorProvider.addNavigator(mockkComposeNavigator)
-            NavigationComponent(navController, mockNavigator)
+            NavigationComponent(navController, mockNavigator, logger)
         }
     }
 

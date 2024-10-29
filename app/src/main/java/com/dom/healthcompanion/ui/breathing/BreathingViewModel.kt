@@ -9,6 +9,7 @@ import com.dom.healthcompanion.domain.breathing.usecase.GetCurrentBreathingExerc
 import com.dom.healthcompanion.domain.breathing.model.BreathingExercise.Companion.OPEN_TIMER
 import com.dom.healthcompanion.utils.ButtonState
 import com.dom.healthcompanion.utils.Text
+import com.dom.logger.Logger
 import com.dom.timer.CountUpTimer
 import com.dom.timer.CountUpTimerImpl
 import com.dom.timer.millisToMinutesAndSeconds
@@ -27,6 +28,7 @@ class BreathingViewModel
         private val dispatchersProvider: DispatchersProvider,
         private val vibrationHelper: VibrationHelper,
         private val soundPlayer: SoundPlayer,
+        private val logger: Logger,
     ) : ViewModel() {
         // region variables
         private var currentExercise: BreathingExercise = getCurrentBreathingExerciseUseCase()
@@ -44,6 +46,7 @@ class BreathingViewModel
                 override fun onFinish(trackedTime: Long) {
                     this@BreathingViewModel.onFinish(trackedTime)
                     notifyUserForNextRound()
+                    logger.d("Timer done with $trackedTime tracked time")
                 }
             }
         // endregion
@@ -81,21 +84,26 @@ class BreathingViewModel
             timer?.setListener(timerListener)
             timer?.start()
             updateButtonState(true)
+            logger.d("Timer started")
         }
 
         private fun onNextClicked() {
             // clear potentially running timers:
             val trackedTime = timer?.stop() ?: 0L
+            logger.d("next button clicked with $trackedTime trackedTime")
             onFinish(trackedTime)
         }
 
         private fun onPauseClicked() {
             timer?.pause()
+            logger.d("next button clicked with ${timer?.time} trackedTime")
             _buttonStateFlow.value = ButtonState(Text.TextRes(R.string.btnResumeText), ::onResumeClicked)
+            logger.d("buttonstate changed to resume state")
         }
 
         private fun onResumeClicked() {
             _buttonStateFlow.value = ButtonState(Text.TextRes(R.string.btnPauseText), ::onPauseClicked)
+            logger.d("next button clicked with ${timer?.time} trackedTime. Show onPause button state.")
             timer?.resume()
         }
         // endregion
@@ -105,6 +113,7 @@ class BreathingViewModel
             // show next button if not open timer but next round needs to be started by user
             val isNextButtonShown = (_buttonStateFlow.value.text as Text.TextRes).resId == R.string.btnNextText
             if (!isNextButtonShown && currentRound.expectedTime != OPEN_TIMER && time >= currentRound.expectedTime) {
+                logger.d("expected time exceeded and next round does not start automatically.")
                 updateButtonState(trackedTime = time)
                 notifyUserForNextRound()
             }
@@ -127,20 +136,24 @@ class BreathingViewModel
         private fun notifyUserForNextRound() {
             vibrationHelper.vibrate(VibrationHelper.VibrationType.NOTIFY_USER)
             soundPlayer.play(R.raw.hero_simple_celebration_03)
+            logger.d("notify user for next round")
         }
 
         private fun onFinish(trackedTime: Long) {
+            logger.d("timer done with $trackedTime")
             updateRoundsData(trackedTime)
             timer?.stop()
             val hasNextRoundBeforeChanging = currentExercise.currenRoundIndex < currentExercise.rounds.lastIndex
             if (hasNextRoundBeforeChanging) {
                 currentExercise.currenRoundIndex++
+                logger.d("start new round with index ${currentExercise.currenRoundIndex} and type = ${currentRound.type}")
                 _timerStateFlow.value = _timerStateFlow.value.copy(type = currentRound.type)
                 cleanUpTimer()
                 timer = createTimer()
                 timer?.setListener(timerListener)
                 timer?.start()
             } else {
+                logger.d("exercise done. Show finished state!")
                 _timerStateFlow.value =
                     _timerStateFlow.value.copy(
                         type = BreathingExercise.RoundType.FINISHED,
@@ -158,6 +171,7 @@ class BreathingViewModel
         ) {
             _buttonStateFlow.value =
                 getButtonState(isNewRound, isDone, trackedTime)
+            logger.d("buttonState updated to ${_buttonStateFlow.value}")
         }
 
         private fun getButtonState(
@@ -167,6 +181,7 @@ class BreathingViewModel
         ): ButtonState {
             val isOpenTimer = currentRound.expectedTime == OPEN_TIMER && !isDone
             val isExpectedTimeDone = isOpenTimer || (!isNewRound && (trackedTime ?: Long.MAX_VALUE) >= currentRound.expectedTime)
+            logger.d("timer: $timer, currentRound = ${currentExercise.currentRound}, hasNextRound = ${currentExercise.hasNextRound}, doesNextRoundStartAutomatically: ${currentExercise.doesNextRoundStartAutomatically} isOpenTimer: $isOpenTimer, isExpectedTimeDone: $isExpectedTimeDone, isNewRound: $isNewRound, isDone: $isDone")
             return when {
                 // Timer was not started
                 timer == null && currentExercise.currenRoundIndex == 0 ->
@@ -210,6 +225,7 @@ class BreathingViewModel
                 } else {
                     CountUpTimer.NO_END_TIME
                 }
+            logger.d("hasOpenTimer=  $hasOpenTimer, hasNextRound = ${currentExercise.hasNextRound}, doesNextRoundStartAutomatically = ${currentExercise.doesNextRoundStartAutomatically}, endTime = $endTimeInMillis")
             return CountUpTimerImpl(
                 endTimeInMillis = endTimeInMillis,
                 periodInMillis = TimeUnit.SECONDS.toMillis(1),
@@ -233,6 +249,7 @@ class BreathingViewModel
             previousRounds.forEachIndexed { index, roundTime ->
                 laps.add(TimerLap(index + 1, roundTime.millisToMinutesAndSeconds()))
             }
+            logger.d("new laps ${laps.joinToString { it.index.toString() + ": " + it.time}}")
             _timerStateFlow.value = _timerStateFlow.value.copy(laps = laps)
         }
 

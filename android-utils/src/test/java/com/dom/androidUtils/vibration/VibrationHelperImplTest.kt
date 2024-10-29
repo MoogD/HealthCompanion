@@ -1,11 +1,9 @@
-package com.dom.androidUtils
+package com.dom.androidUtils.vibration
 
 import android.content.Context
 import android.os.VibrationEffect
 import android.os.Vibrator
 import com.dom.androidUtils.vibration.VibrationHelperImpl.Companion.DEFAULT_DURATION
-import com.dom.androidUtils.vibration.VibrationHelper
-import com.dom.androidUtils.vibration.VibrationHelperImpl
 import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.justRun
@@ -25,7 +23,7 @@ class VibrationHelperImplTest {
 
     private val mockkContext: Context = mockk()
     private val mockkVibrator: Vibrator = mockk()
-    private lateinit var sut: VibrationHelper
+    private lateinit var sut: VibrationHelperImpl
 
     @BeforeEach
     fun setUp() {

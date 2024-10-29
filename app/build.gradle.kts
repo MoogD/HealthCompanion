@@ -44,6 +44,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.1"
@@ -69,6 +70,7 @@ dependencies {
     implementation(project(":timer"))
     implementation(project(":utils"))
     implementation(project(":android-utils"))
+    implementation(project(":logger"))
     testImplementation(project(":test-utils"))
 
     implementation(libs.androidx.core.ktx)

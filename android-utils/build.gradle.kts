@@ -38,8 +38,11 @@ android {
 }
 
 dependencies {
-
+    implementation(project(":logger"))
     implementation(libs.androidx.core.ktx)
+
+    // logging
+    implementation(libs.timber)
 
     // unit tests
     testImplementation(platform(libs.junit.bom))

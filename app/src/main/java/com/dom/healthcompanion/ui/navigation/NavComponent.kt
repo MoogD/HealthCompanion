@@ -10,6 +10,7 @@ import com.dom.healthcompanion.ui.breathing.BreathingScreen
 import com.dom.healthcompanion.ui.breathing.BreathingViewModel
 import com.dom.healthcompanion.ui.featureList.FeatureListScreen
 import com.dom.healthcompanion.ui.featureList.FeatureListViewModel
+import com.dom.logger.Logger
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
@@ -17,10 +18,12 @@ import kotlinx.coroutines.flow.onEach
 fun NavigationComponent(
     navController: NavHostController,
     navigator: Navigator,
+    logger: Logger,
 ) {
     // match lifecycle of NavigationComponent
     LaunchedEffect(true) {
         navigator.navTarget.onEach {
+            logger.d("navigate to ${it.navName}")
             navController.navigate(it.navName)
         }.launchIn(this)
     }

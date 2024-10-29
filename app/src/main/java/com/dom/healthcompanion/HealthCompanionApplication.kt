@@ -11,7 +11,7 @@ class HealthCompanionApplication : Application() {
         if (BuildConfig.DEBUG) {
             // enable calling class name as tags when adding remote logger or similar
             // keep TimberLogger as tag (useCallingClassAsTag = false) for easier filtering for custom logs
-            TimberLogger.init(useCallingClassAsTag = true)
+            TimberLogger.init(useCallingClassAsTag = false)
         }
     }
 }

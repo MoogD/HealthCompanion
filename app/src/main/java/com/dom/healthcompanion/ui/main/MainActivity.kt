@@ -13,6 +13,7 @@ import com.dom.healthcompanion.R
 import com.dom.healthcompanion.ui.navigation.NavigationComponent
 import com.dom.healthcompanion.ui.navigation.Navigator
 import com.dom.healthcompanion.ui.theme.HealthCompanionTheme
+import com.dom.logger.Logger
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -21,6 +22,9 @@ class MainActivity : ComponentActivity() {
     @Inject
     lateinit var navigator: Navigator
 
+    @Inject
+    lateinit var logger: Logger
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -28,7 +32,7 @@ class MainActivity : ComponentActivity() {
             HealthCompanionTheme {
                 Column {
                     AppTopBar(stringResource(R.string.app_name)) { }
-                    NavigationComponent(navController = rememberNavController(), navigator)
+                    NavigationComponent(navController = rememberNavController(), navigator, logger)
                 }
             }
         }

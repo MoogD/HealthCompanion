@@ -11,6 +11,7 @@ import com.dom.healthcompanion.domain.breathing.model.BreathingExercise
 import com.dom.healthcompanion.domain.breathing.model.ButeykoBreathing
 import com.dom.healthcompanion.domain.breathing.usecase.GetCurrentBreathingExerciseUseCase
 import com.dom.healthcompanion.utils.Text
+import com.dom.logger.Logger
 import com.dom.testUtils.TestDispatcherProvider
 import com.dom.timer.CountUpTimer
 import com.dom.timer.CountUpTimerImpl
@@ -93,6 +94,7 @@ class BreathingViewModelTest {
     private val getCurrentBreathingExerciseUseCase: GetCurrentBreathingExerciseUseCase = mockk()
     private val mockVibrationHelper = mockk<VibrationHelper>(relaxed = true)
     private val mockSoundPlayer = mockk<SoundPlayer>(relaxed = true)
+    private val logger: Logger = mockk(relaxed = true)
 
     private val testDispatcher = TestDispatcherProvider()
 
@@ -101,7 +103,7 @@ class BreathingViewModelTest {
     @BeforeEach
     fun setUp() {
         every { getCurrentBreathingExerciseUseCase() } returns defaultExercise
-        sut = BreathingViewModel(getCurrentBreathingExerciseUseCase, testDispatcher, mockVibrationHelper, mockSoundPlayer)
+        initSut()
     }
 
     @AfterEach
@@ -160,7 +162,7 @@ class BreathingViewModelTest {
                         override var currenRoundIndex: Int = 0
                     }
                 every { getCurrentBreathingExerciseUseCase() } returns expectedExercise
-                sut = BreathingViewModel(getCurrentBreathingExerciseUseCase, testDispatcher, mockVibrationHelper, mockSoundPlayer)
+                initSut()
                 // Act
                 sut.buttonStateFlow.value.onClick.invoke()
                 // Assert
@@ -202,7 +204,7 @@ class BreathingViewModelTest {
                         override var currenRoundIndex: Int = 0
                     }
                 every { getCurrentBreathingExerciseUseCase() } returns expectedExercise
-                sut = BreathingViewModel(getCurrentBreathingExerciseUseCase, testDispatcher, mockVibrationHelper, mockSoundPlayer)
+                initSut()
                 // Act
                 sut.buttonStateFlow.value.onClick.invoke()
                 // Assert
@@ -248,7 +250,7 @@ class BreathingViewModelTest {
                     override var currenRoundIndex: Int = 0
                 }
             every { getCurrentBreathingExerciseUseCase() } returns expectedExercise
-            sut = BreathingViewModel(getCurrentBreathingExerciseUseCase, testDispatcher, mockVibrationHelper, mockSoundPlayer)
+            initSut()
             // Act
             sut.buttonStateFlow.value.onClick.invoke()
             // Assert
@@ -294,7 +296,7 @@ class BreathingViewModelTest {
                     override var currenRoundIndex: Int = 0
                 }
             every { getCurrentBreathingExerciseUseCase() } returns expectedExercise
-            sut = BreathingViewModel(getCurrentBreathingExerciseUseCase, testDispatcher, mockVibrationHelper, mockSoundPlayer)
+            initSut()
             // Act
             sut.buttonStateFlow.value.onClick.invoke()
             // Assert
@@ -340,7 +342,7 @@ class BreathingViewModelTest {
                         override var currenRoundIndex: Int = 0
                     }
                 every { getCurrentBreathingExerciseUseCase() } returns expectedExercise
-                sut = BreathingViewModel(getCurrentBreathingExerciseUseCase, testDispatcher, mockVibrationHelper, mockSoundPlayer)
+                initSut()
                 sut.buttonStateFlow.test {
                     // catch initial state
                     awaitItem()
@@ -375,7 +377,7 @@ class BreathingViewModelTest {
                         override var currenRoundIndex: Int = 0
                     }
                 every { getCurrentBreathingExerciseUseCase() } returns expectedExercise
-                sut = BreathingViewModel(getCurrentBreathingExerciseUseCase, testDispatcher, mockVibrationHelper, mockSoundPlayer)
+                initSut()
                 sut.buttonStateFlow.test {
                     // catch initial state
                     awaitItem()
@@ -410,7 +412,7 @@ class BreathingViewModelTest {
                         override var currenRoundIndex: Int = 0
                     }
                 every { getCurrentBreathingExerciseUseCase() } returns expectedExercise
-                sut = BreathingViewModel(getCurrentBreathingExerciseUseCase, testDispatcher, mockVibrationHelper, mockSoundPlayer)
+                initSut()
                 sut.buttonStateFlow.test {
                     // catch initial state
                     awaitItem()
@@ -440,7 +442,7 @@ class BreathingViewModelTest {
                         override var currenRoundIndex: Int = 0
                     }
                 every { getCurrentBreathingExerciseUseCase() } returns expectedExercise
-                sut = BreathingViewModel(getCurrentBreathingExerciseUseCase, testDispatcher, mockVibrationHelper, mockSoundPlayer)
+                initSut()
                 sut.buttonStateFlow.test {
                     // catch initial state
                     awaitItem()
@@ -470,7 +472,7 @@ class BreathingViewModelTest {
                         override var currenRoundIndex: Int = 0
                     }
                 every { getCurrentBreathingExerciseUseCase() } returns expectedExercise
-                sut = BreathingViewModel(getCurrentBreathingExerciseUseCase, testDispatcher, mockVibrationHelper, mockSoundPlayer)
+                initSut()
                 sut.buttonStateFlow.test {
                     // catch initial state
                     awaitItem()
@@ -511,7 +513,7 @@ class BreathingViewModelTest {
                     expectedExercise.currenRoundIndex = 0
                     return@answers expectedExercise
                 }
-                sut = BreathingViewModel(getCurrentBreathingExerciseUseCase, testDispatcher, mockVibrationHelper, mockSoundPlayer)
+                initSut()
 
                 clearMocks(getCurrentBreathingExerciseUseCase, answers = false)
                 // start timer by button press
@@ -562,7 +564,7 @@ class BreathingViewModelTest {
                         override var currenRoundIndex: Int = 0
                     }
                 every { getCurrentBreathingExerciseUseCase() } returns expectedExercise
-                sut = BreathingViewModel(getCurrentBreathingExerciseUseCase, testDispatcher, mockVibrationHelper, mockSoundPlayer)
+                initSut()
                 // start timer to trigger update of button state to next button
                 sut.buttonStateFlow.value.onClick()
                 clearConstructorMockk(CountUpTimerImpl::class)
@@ -599,7 +601,7 @@ class BreathingViewModelTest {
                         override var currenRoundIndex: Int = 0
                     }
                 every { getCurrentBreathingExerciseUseCase() } returns expectedExercise
-                sut = BreathingViewModel(getCurrentBreathingExerciseUseCase, testDispatcher, mockVibrationHelper, mockSoundPlayer)
+                initSut()
                 // start timer to trigger update of button state to next button
                 sut.buttonStateFlow.value.onClick()
                 val previousRounds = sut.timerStateFlow.value.laps
@@ -640,7 +642,7 @@ class BreathingViewModelTest {
                         override var currenRoundIndex: Int = 0
                     }
                 every { getCurrentBreathingExerciseUseCase() } returns expectedExercise
-                sut = BreathingViewModel(getCurrentBreathingExerciseUseCase, testDispatcher, mockVibrationHelper, mockSoundPlayer)
+                initSut()
                 // start timer and simulate time passed to trigger update of button state to next button
                 sut.buttonStateFlow.value.onClick()
                 timerListenerSlot.captured.onTick(passedTime)
@@ -685,7 +687,7 @@ class BreathingViewModelTest {
                         override var currenRoundIndex: Int = initialIndex
                     }
                 every { getCurrentBreathingExerciseUseCase() } returns expectedExercise
-                sut = BreathingViewModel(getCurrentBreathingExerciseUseCase, testDispatcher, mockVibrationHelper, mockSoundPlayer)
+                initSut()
                 // start timer and simulate time passed to trigger update of button state to next button
                 sut.buttonStateFlow.value.onClick()
                 timerListenerSlot.captured.onTick(passedTime)
@@ -734,7 +736,7 @@ class BreathingViewModelTest {
                         override var currenRoundIndex: Int = 0
                     }
                 every { getCurrentBreathingExerciseUseCase() } returns expectedExercise
-                sut = BreathingViewModel(getCurrentBreathingExerciseUseCase, testDispatcher, mockVibrationHelper, mockSoundPlayer)
+                initSut()
                 // start timer and simulate time passed to trigger update of button state to next button
                 sut.buttonStateFlow.value.onClick()
                 // Act
@@ -772,7 +774,7 @@ class BreathingViewModelTest {
                         override var currenRoundIndex: Int = 0
                     }
                 every { getCurrentBreathingExerciseUseCase() } returns expectedExercise
-                sut = BreathingViewModel(getCurrentBreathingExerciseUseCase, testDispatcher, mockVibrationHelper, mockSoundPlayer)
+                initSut()
                 // start timer and simulate time passed to trigger update of button state to next button
                 sut.buttonStateFlow.value.onClick()
                 // Act
@@ -807,7 +809,7 @@ class BreathingViewModelTest {
                         override var currenRoundIndex: Int = 0
                     }
                 every { getCurrentBreathingExerciseUseCase() } returns expectedExercise
-                sut = BreathingViewModel(getCurrentBreathingExerciseUseCase, testDispatcher, mockVibrationHelper, mockSoundPlayer)
+                initSut()
                 // start timer and simulate time passed to trigger update of button state to next button
                 sut.buttonStateFlow.value.onClick()
                 // Act
@@ -850,7 +852,7 @@ class BreathingViewModelTest {
                         override var currenRoundIndex: Int = initialIndex
                     }
                 every { getCurrentBreathingExerciseUseCase() } returns expectedExercise
-                sut = BreathingViewModel(getCurrentBreathingExerciseUseCase, testDispatcher, mockVibrationHelper, mockSoundPlayer)
+                initSut()
                 // start timer and simulate time passed to trigger update of button state to next button
                 sut.buttonStateFlow.value.onClick()
                 // Act
@@ -890,7 +892,7 @@ class BreathingViewModelTest {
                         override var currenRoundIndex: Int = initialIndex
                     }
                 every { getCurrentBreathingExerciseUseCase() } returns expectedExercise
-                sut = BreathingViewModel(getCurrentBreathingExerciseUseCase, testDispatcher, mockVibrationHelper, mockSoundPlayer)
+                initSut()
                 // start timer and simulate time passed to trigger update of button state to next button
                 sut.buttonStateFlow.value.onClick()
                 // trigger next button shown
@@ -940,7 +942,7 @@ class BreathingViewModelTest {
                     }
                 every { getCurrentBreathingExerciseUseCase() } returns expectedExercise
                 every { anyConstructed<CountUpTimerImpl>().time } returns timerTime
-                sut = BreathingViewModel(getCurrentBreathingExerciseUseCase, testDispatcher, mockVibrationHelper, mockSoundPlayer)
+                initSut()
                 // start timer and simulate time passed to trigger update of button state to next button
                 sut.buttonStateFlow.value.onClick()
                 sut.buttonStateFlow.test {
@@ -985,7 +987,7 @@ class BreathingViewModelTest {
                     }
                 every { getCurrentBreathingExerciseUseCase() } returns expectedExercise
                 every { anyConstructed<CountUpTimerImpl>().time } returns passedTime
-                sut = BreathingViewModel(getCurrentBreathingExerciseUseCase, testDispatcher, mockVibrationHelper, mockSoundPlayer)
+                initSut()
                 // start timer and simulate time passed to trigger update of button state to next button
                 sut.buttonStateFlow.value.onClick()
                 sut.buttonStateFlow.test {
@@ -1028,7 +1030,7 @@ class BreathingViewModelTest {
                     }
                 every { getCurrentBreathingExerciseUseCase() } returns expectedExercise
                 every { anyConstructed<CountUpTimerImpl>().time } returns onTickTime
-                sut = BreathingViewModel(getCurrentBreathingExerciseUseCase, testDispatcher, mockVibrationHelper, mockSoundPlayer)
+                initSut()
                 // start timer and simulate time passed to trigger update of button state to next button
                 sut.buttonStateFlow.value.onClick()
                 // Act
@@ -1070,7 +1072,7 @@ class BreathingViewModelTest {
                     }
                 every { getCurrentBreathingExerciseUseCase() } returns expectedExercise
                 every { anyConstructed<CountUpTimerImpl>().time } returns onTickTime
-                sut = BreathingViewModel(getCurrentBreathingExerciseUseCase, testDispatcher, mockVibrationHelper, mockSoundPlayer)
+                initSut()
                 // start timer and simulate time passed to trigger update of button state to next button
                 sut.buttonStateFlow.value.onClick()
                 // Act
@@ -1118,7 +1120,7 @@ class BreathingViewModelTest {
                         override var currenRoundIndex: Int = 0
                     }
                 every { getCurrentBreathingExerciseUseCase() } returns expectedExercise
-                sut = BreathingViewModel(getCurrentBreathingExerciseUseCase, testDispatcher, mockVibrationHelper, mockSoundPlayer)
+                initSut()
                 // start timer and simulate time passed to trigger update of button state to next button
                 sut.buttonStateFlow.value.onClick()
                 // simulate all rounds except last one to be done
@@ -1166,7 +1168,7 @@ class BreathingViewModelTest {
                         override var currenRoundIndex: Int = 0
                     }
                 every { getCurrentBreathingExerciseUseCase() } returns expectedExercise
-                sut = BreathingViewModel(getCurrentBreathingExerciseUseCase, testDispatcher, mockVibrationHelper, mockSoundPlayer)
+                initSut()
                 // start timer to get listener slot
                 sut.buttonStateFlow.value.onClick()
                 val previousRounds = sut.timerStateFlow.value.laps
@@ -1207,7 +1209,7 @@ class BreathingViewModelTest {
                         override var currenRoundIndex: Int = 0
                     }
                 every { getCurrentBreathingExerciseUseCase() } returns expectedExercise
-                sut = BreathingViewModel(getCurrentBreathingExerciseUseCase, testDispatcher, mockVibrationHelper, mockSoundPlayer)
+                initSut()
                 // start timer
                 sut.buttonStateFlow.value.onClick()
                 val previousRounds = sut.timerStateFlow.value.laps
@@ -1250,7 +1252,7 @@ class BreathingViewModelTest {
                         override var currenRoundIndex: Int = initialIndex
                     }
                 every { getCurrentBreathingExerciseUseCase() } returns expectedExercise
-                sut = BreathingViewModel(getCurrentBreathingExerciseUseCase, testDispatcher, mockVibrationHelper, mockSoundPlayer)
+                initSut()
                 // start timer
                 sut.buttonStateFlow.value.onClick()
                 // mockk constructor again to cancel old constructor mock and enable new constructor
@@ -1300,7 +1302,7 @@ class BreathingViewModelTest {
                         override var currenRoundIndex: Int = 0
                     }
                 every { getCurrentBreathingExerciseUseCase() } returns expectedExercise
-                sut = BreathingViewModel(getCurrentBreathingExerciseUseCase, testDispatcher, mockVibrationHelper, mockSoundPlayer)
+                initSut()
                 // start timer
                 sut.buttonStateFlow.value.onClick()
                 // Act
@@ -1340,7 +1342,7 @@ class BreathingViewModelTest {
                         override var currenRoundIndex: Int = 0
                     }
                 every { getCurrentBreathingExerciseUseCase() } returns expectedExercise
-                sut = BreathingViewModel(getCurrentBreathingExerciseUseCase, testDispatcher, mockVibrationHelper, mockSoundPlayer)
+                initSut()
                 // start timer
                 sut.buttonStateFlow.value.onClick()
                 // Act
@@ -1377,7 +1379,7 @@ class BreathingViewModelTest {
                         override var currenRoundIndex: Int = 0
                     }
                 every { getCurrentBreathingExerciseUseCase() } returns expectedExercise
-                sut = BreathingViewModel(getCurrentBreathingExerciseUseCase, testDispatcher, mockVibrationHelper, mockSoundPlayer)
+                initSut()
                 // start timer
                 sut.buttonStateFlow.value.onClick()
                 // Act
@@ -1397,7 +1399,7 @@ class BreathingViewModelTest {
                 justRun { anyConstructed<CountUpTimerImpl>().setListener(capture(listenerSlot)) }
                 val expectedExercise = ButeykoBreathing()
                 every { getCurrentBreathingExerciseUseCase() } returns expectedExercise
-                sut = BreathingViewModel(getCurrentBreathingExerciseUseCase, testDispatcher, mockVibrationHelper, mockSoundPlayer)
+                initSut()
                 // start timer
                 sut.buttonStateFlow.value.onClick()
                 // Act
@@ -1432,7 +1434,7 @@ class BreathingViewModelTest {
                         override var currenRoundIndex: Int = 0
                     }
                 every { getCurrentBreathingExerciseUseCase() } returns expectedExercise
-                sut = BreathingViewModel(getCurrentBreathingExerciseUseCase, testDispatcher, mockVibrationHelper, mockSoundPlayer)
+                initSut()
                 // start timer and simulate time passed to trigger update of button state to next button
                 sut.buttonStateFlow.value.onClick()
 
@@ -1508,7 +1510,7 @@ class BreathingViewModelTest {
                     override var currenRoundIndex: Int = 0
                 }
             every { getCurrentBreathingExerciseUseCase() } returns expectedExercise
-            sut = BreathingViewModel(getCurrentBreathingExerciseUseCase, testDispatcher, mockVibrationHelper, mockSoundPlayer)
+            initSut()
             // trigger pause button shown
             sut.buttonStateFlow.value.onClick.invoke()
             sut.buttonStateFlow.test {
@@ -1548,7 +1550,7 @@ class BreathingViewModelTest {
                     override var currenRoundIndex: Int = 0
                 }
             every { getCurrentBreathingExerciseUseCase() } returns expectedExercise
-            sut = BreathingViewModel(getCurrentBreathingExerciseUseCase, testDispatcher, mockVibrationHelper, mockSoundPlayer)
+            initSut()
             // trigger pause button shown
             sut.buttonStateFlow.value.onClick.invoke()
             // pause to trigger resume button shown
@@ -1563,4 +1565,10 @@ class BreathingViewModelTest {
                 verify { anyConstructed<CountUpTimerImpl>().resume() }
             }
         }
+
+    // region helper functions
+    private fun initSut() {
+        sut = BreathingViewModel(getCurrentBreathingExerciseUseCase, testDispatcher, mockVibrationHelper, mockSoundPlayer, logger)
+    }
+    // endregion
 }

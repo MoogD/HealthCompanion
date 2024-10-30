@@ -22,6 +22,7 @@ hilt-compose = "1.2.0"
 robolectric-version = "4.11.1"
 fragment-testing = "1.8.4"
 mockposable = "0.10"
+timber = "5.0.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -37,13 +38,14 @@ androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 androidx-navigation = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigation" }
 compose-constraint-layout = { group = "androidx.constraintlayout", name = "constraintlayout-compose", version.ref = "composeConstraintLayout" }
+timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "timber" }
 
 # testing
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 junit-bom = { group = "org.junit", name = "junit-bom", version.ref = "junitBom" }
 junit-jupiter = { group = "org.junit.jupiter", name = "junit-jupiter" }
 junit-platform = { group = "org.junit.platform", name = "junit-platform-launcher" }
-junit-vintage = { group = "org.junit.vintage", name = "junit-vintage-engine"}
+junit-vintage = { group = "org.junit.vintage", name = "junit-vintage-engine" }
 mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
 hamcrest = { group = "org.hamcrest", name = "hamcrest-all", version.ref = "hamcrest" }
 turbine = { group = "app.cash.turbine", name = "turbine", version.ref = "turbine" }
@@ -71,5 +73,5 @@ hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "jetbrainsKotlinJvm" }
 kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kover" }
-mockposable = { id = "com.jeppeman.mockposable", version.ref = "mockposable"}
+mockposable = { id = "com.jeppeman.mockposable", version.ref = "mockposable" }
 android-library = { id = "com.android.library", version.ref = "agp" }

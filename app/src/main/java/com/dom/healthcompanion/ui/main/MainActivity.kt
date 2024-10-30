@@ -31,7 +31,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             HealthCompanionTheme {
                 Column {
-                    AppTopBar(stringResource(R.string.app_name)) { }
+                    AppTopBar(stringResource(R.string.app_name)) { onBackPressedDispatcher.onBackPressed() }
                     NavigationComponent(navController = rememberNavController(), navigator, logger)
                 }
             }

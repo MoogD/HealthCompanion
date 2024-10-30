@@ -38,8 +38,7 @@ fun NavigationComponent(
                 breathingViewModel.titleFlow,
                 breathingViewModel.timerStateFlow,
                 breathingViewModel.buttonStateFlow,
-//                breathingViewModel::onStopClicked,
-                {},
+                breathingViewModel::onStopClicked,
             )
         }
     }

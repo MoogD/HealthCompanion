@@ -89,6 +89,9 @@ class BreathingViewModelTest {
 
     // 39- When resume button state clicked, then call resume on timer and show pause button state
 
+    // 40- When onStopClicked invoked, given there is no timer, then reset current exercise, button and timer states
+    // 41- When onStopClicked invoked, given there is a timer, then call stop on timer and remove listeners and reset current exercise, button and timer states
+
     // endregion
     val defaultExercise = ButeykoBreathing()
     private val getCurrentBreathingExerciseUseCase: GetCurrentBreathingExerciseUseCase = mockk()
@@ -1565,6 +1568,136 @@ class BreathingViewModelTest {
                 verify { anyConstructed<CountUpTimerImpl>().resume() }
             }
         }
+
+    @Nested
+    @DisplayName("When onStopClicked invoked")
+    inner class OnStopClicked {
+        @Test
+        fun `40- given there is no timer, then reset current exercise, button and timer states`() =
+            runTest {
+                // Arrange
+                mockkConstructor(CountUpTimerImpl::class)
+                val expectedExercise =
+                    object : BreathingExercise {
+                        override val title: Text = Text.TextRes(R.string.buteyko_breathing_title)
+                        override val rounds: List<BreathingExercise.BreathingRound> =
+                            listOf(
+                                BreathingExercise.BreathingRound(
+                                    1000L,
+                                    BreathingExercise.RoundType.NORMAL_BREATHING,
+                                    false,
+                                ),
+                                BreathingExercise.BreathingRound(
+                                    1000L,
+                                    BreathingExercise.RoundType.LOWER_BREATHING,
+                                    true,
+                                ),
+                            )
+                        override var currenRoundIndex: Int = 0
+                    }
+                every { getCurrentBreathingExerciseUseCase() } returns expectedExercise
+                initSut()
+                clearMocks(getCurrentBreathingExerciseUseCase, answers = false)
+                // Act
+                sut.onStopClicked()
+                // Assert
+                verify { getCurrentBreathingExerciseUseCase() }
+                // verify timerstate
+                val timerState = sut.timerStateFlow.value
+                assertThat(timerState.type, `is`(BreathingExercise.RoundType.IDLE))
+                assertThat(timerState.currentTimeText, `is`(BreathingViewModel.STARTING_TIME_STRING))
+                assertThat(timerState.totalTimeText, `is`(BreathingViewModel.STARTING_TIME_STRING))
+                assertThat(timerState.progress, `is`(0f))
+                assertThat(timerState.laps.size, `is`(0))
+                // verify button state
+                val buttonState = sut.buttonStateFlow.value
+                assertThat(buttonState.text, `is`(Text.TextRes(R.string.btnStartText)))
+            }
+
+        @ParameterizedTest
+        @ValueSource(ints = [1, 2, 3, 4, 5])
+        fun `41- given there is a timer, then call stop on timer and remove listeners and reset current exercise, button and timer states`(currentRoundIndex: Int) =
+            runTest {
+                // Arrange
+                mockkConstructor(CountUpTimerImpl::class)
+                justRun { anyConstructed<CountUpTimerImpl>().start() }
+                every { anyConstructed<CountUpTimerImpl>().stop() } returns 0L
+                justRun { anyConstructed<CountUpTimerImpl>().removeListener(any()) }
+                justRun { anyConstructed<CountUpTimerImpl>().setListener(any()) }
+                val expectedExercise =
+                    object : BreathingExercise {
+                        override val title: Text = Text.TextRes(R.string.buteyko_breathing_title)
+                        override val rounds: List<BreathingExercise.BreathingRound> =
+                            listOf(
+                                // use round to show next button first
+                                BreathingExercise.BreathingRound(
+                                    BreathingExercise.OPEN_TIMER,
+                                    BreathingExercise.RoundType.NORMAL_BREATHING,
+                                    false,
+                                ),
+                                BreathingExercise.BreathingRound(
+                                    BreathingExercise.OPEN_TIMER,
+                                    BreathingExercise.RoundType.NORMAL_BREATHING,
+                                    false,
+                                ),
+                                BreathingExercise.BreathingRound(
+                                    1000L,
+                                    BreathingExercise.RoundType.LOWER_BREATHING,
+                                    false,
+                                ),
+                                BreathingExercise.BreathingRound(
+                                    BreathingExercise.OPEN_TIMER,
+                                    BreathingExercise.RoundType.HOLD,
+                                    false,
+                                ),
+                                BreathingExercise.BreathingRound(
+                                    2000L,
+                                    BreathingExercise.RoundType.INHALE,
+                                    true,
+                                ),
+                                BreathingExercise.BreathingRound(
+                                    BreathingExercise.OPEN_TIMER,
+                                    BreathingExercise.RoundType.EXHALE,
+                                    false,
+                                ),
+                            )
+                        override var currenRoundIndex: Int = 0
+                    }
+                every { getCurrentBreathingExerciseUseCase() } answers {
+                    // reset currentRoundIndex whenever new exercise is requested
+                    expectedExercise.currenRoundIndex = 0
+                    expectedExercise
+                }
+                initSut()
+                val listenerSlot = slot<CountUpTimer.Listener>()
+                // start to create timer
+                sut.buttonStateFlow.value.onClick()
+                // capture listener to check correct listener removed
+                verify { anyConstructed<CountUpTimerImpl>().setListener(capture(listenerSlot)) }
+                // change current round and trigger new round
+                assertThat(sut.buttonStateFlow.value.text, `is`(Text.TextRes(R.string.btnNextText)))
+                expectedExercise.currenRoundIndex = currentRoundIndex
+                sut.buttonStateFlow.value.onClick()
+                clearConstructorMockk(CountUpTimerImpl::class, answers = false)
+                clearMocks(getCurrentBreathingExerciseUseCase, answers = false)
+                // Act
+                sut.onStopClicked()
+                // Assert
+                verify { getCurrentBreathingExerciseUseCase() }
+                verify { anyConstructed<CountUpTimerImpl>().stop() }
+                verify { anyConstructed<CountUpTimerImpl>().removeListener(listenerSlot.captured) }
+                // verify timerstate
+                val timerState = sut.timerStateFlow.value
+                assertThat(timerState.type, `is`(BreathingExercise.RoundType.IDLE))
+                assertThat(timerState.currentTimeText, `is`(BreathingViewModel.STARTING_TIME_STRING))
+                assertThat(timerState.totalTimeText, `is`(BreathingViewModel.STARTING_TIME_STRING))
+                assertThat(timerState.progress, `is`(0f))
+                assertThat(timerState.laps.size, `is`(0))
+                // verify button state
+                val buttonState = sut.buttonStateFlow.value
+                assertThat(buttonState.text, `is`(Text.TextRes(R.string.btnStartText)))
+            }
+    }
 
     // region helper functions
     private fun initSut() {

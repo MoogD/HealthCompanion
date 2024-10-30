@@ -249,8 +249,17 @@ class BreathingViewModel
             previousRounds.forEachIndexed { index, roundTime ->
                 laps.add(TimerLap(index + 1, roundTime.millisToMinutesAndSeconds()))
             }
-            logger.d("new laps ${laps.joinToString { it.index.toString() + ": " + it.time}}")
+            logger.d("new laps ${laps.joinToString { it.index.toString() + ": " + it.time }}")
             _timerStateFlow.value = _timerStateFlow.value.copy(laps = laps)
+        }
+
+        fun onStopClicked() {
+            logger.d("onStopClicked reset timer and states.")
+            cleanUpTimer()
+            currentExercise = getCurrentBreathingExerciseUseCase()
+            previousRounds.clear()
+            _timerStateFlow.value = getInitialTimerState()
+            updateButtonState(true)
         }
 
         override fun onCleared() {

@@ -23,7 +23,7 @@ class MainViewModel
         private val _topBarTitleFlow = MutableStateFlow<TextString>(TextString.Res(R.string.app_name))
         val topBarTitleFlow: StateFlow<TextString>
             get() = _topBarTitleFlow
-        private val _topBarIconFlow = MutableStateFlow(IconState(false, IconState.Type.Back, ::onBackPressed))
+        private val _topBarIconFlow = MutableStateFlow(IconState(false, IconState.Type.BACK, ::onBackPressed))
         val topBarIconFlow: StateFlow<IconState>
             get() = _topBarIconFlow
 

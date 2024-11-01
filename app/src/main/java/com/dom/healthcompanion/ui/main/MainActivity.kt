@@ -6,8 +6,6 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Column
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -76,13 +74,5 @@ class MainActivity : ComponentActivity() {
     private fun onDestinationChanged(destination: NavDestination) {
         val navItem = NavItem.fromNavName(destination.route ?: "") ?: return
         viewModel.onNavigationDestinationChanged(navItem)
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    HealthCompanionTheme {
-//        Greeting("Android")
     }
 }

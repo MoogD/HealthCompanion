@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextAlign
 import com.dom.healthcompanion.R
 import com.dom.healthcompanion.utils.IconState
@@ -25,7 +26,7 @@ fun AppTopBar(
     iconStateFlow: Flow<IconState>,
 ) {
     val title = topAppBarTextFlow.collectAsState(initial = TextString.Res(R.string.app_name)).value
-    val iconState = iconStateFlow.collectAsState(initial = IconState(false, IconState.Type.Back) {}).value
+    val iconState = iconStateFlow.collectAsState(initial = IconState(false, IconState.Type.BACK) {}).value
     CenterAlignedTopAppBar(
         title = {
             Text(
@@ -33,6 +34,7 @@ fun AppTopBar(
                 textAlign = TextAlign.Center,
                 modifier =
                     Modifier
+                        .testTag("topBarTitle")
                         .wrapContentWidth()
                         .wrapContentSize(Alignment.Center),
             )
@@ -44,7 +46,8 @@ fun AppTopBar(
                 ) {
                     Icon(
                         iconState.iconType.vector,
-                        contentDescription = "backIcon",
+                        contentDescription = "topBarIcon",
+                        modifier = Modifier.testTag(iconState.iconType.vector.toString()),
                     )
                 }
             }

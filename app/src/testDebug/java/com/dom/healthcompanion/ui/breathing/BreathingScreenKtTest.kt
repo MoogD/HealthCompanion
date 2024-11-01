@@ -14,7 +14,7 @@ import com.dom.healthcompanion.domain.breathing.model.BreathingExercise
 import com.dom.healthcompanion.R
 import com.dom.healthcompanion.ui.TestTags
 import com.dom.healthcompanion.utils.ButtonState
-import com.dom.healthcompanion.utils.Text
+import com.dom.healthcompanion.utils.TextString
 import com.dom.testUtils.assertCorrectTextShown
 import com.dom.testUtils.assertCountForTag
 import com.dom.testUtils.getProgressIndicatorProgress
@@ -75,7 +75,7 @@ class BreathingScreenKtTest {
         ShadowLog.stream = System.out
     }
 
-    private val titleFlow = MutableStateFlow(Text.TextString("test"))
+    private val titleFlow = MutableStateFlow(TextString.String("test"))
     private val timerStateFlow =
         MutableStateFlow(
             TimerState(
@@ -85,14 +85,14 @@ class BreathingScreenKtTest {
                 0f,
             ),
         )
-    private val buttonStateFlow = MutableStateFlow(ButtonState(Text.TextString("test")) {})
+    private val buttonStateFlow = MutableStateFlow(ButtonState(TextString.String("test")) {})
     private val onStopClicked = mockk<() -> Unit>()
 
     @Test
     fun `1- When shown, then show correct title, timerState and buttonState`() {
         // Arrange
         val expectedTitleText = "TestTitle123"
-        titleFlow.value = Text.TextString(expectedTitleText)
+        titleFlow.value = TextString.String(expectedTitleText)
         val expectedTimerState =
             TimerState(
                 BreathingExercise.RoundType.LOWER_BREATHING,
@@ -102,7 +102,7 @@ class BreathingScreenKtTest {
             )
         timerStateFlow.value = expectedTimerState
         val buttonStateText = "testButtonState"
-        val expectedButtonState = ButtonState(Text.TextString(buttonStateText)) {}
+        val expectedButtonState = ButtonState(TextString.String(buttonStateText)) {}
         buttonStateFlow.value = expectedButtonState
         // Act
         composeTestRule.setContent {
@@ -141,7 +141,7 @@ class BreathingScreenKtTest {
             )
         }
         // Act
-        titleFlow.update { Text.TextString(expectedTitleText) }
+        titleFlow.update { TextString.String(expectedTitleText) }
         // Assert
         composeTestRule.assertCorrectTextShown(expectedTitleText, TestTags.TITLE_TEXT_TAG)
     }
@@ -439,7 +439,7 @@ class BreathingScreenKtTest {
     fun `17- When buttonState onClick invoked, then invoke onClick`() {
         // Arrange
         val onClick = mockk<() -> Unit>(relaxed = true)
-        buttonStateFlow.update { buttonStateFlow.value.copy(onClick = onClick, text = Text.TextRes(R.string.btnStartText)) }
+        buttonStateFlow.update { buttonStateFlow.value.copy(onClick = onClick, text = TextString.Res(R.string.btnStartText)) }
         composeTestRule.setContent {
             BreathingScreen(
                 titleFlow = titleFlow,
@@ -458,7 +458,7 @@ class BreathingScreenKtTest {
     fun `18- When buttonState updated, given onClick changed, then update button onClick function`() {
         // Arrange
         val onClick = mockk<() -> Unit>()
-        buttonStateFlow.update { buttonStateFlow.value.copy(onClick = onClick, text = Text.TextRes(R.string.btnStartText)) }
+        buttonStateFlow.update { buttonStateFlow.value.copy(onClick = onClick, text = TextString.Res(R.string.btnStartText)) }
         composeTestRule.setContent {
             BreathingScreen(
                 titleFlow = titleFlow,
@@ -480,7 +480,7 @@ class BreathingScreenKtTest {
     fun `19- When buttonState updated, given text changed, then update button text`() {
         // Arrange
         val onClick = mockk<() -> Unit>()
-        buttonStateFlow.update { buttonStateFlow.value.copy(onClick = onClick, text = Text.TextRes(R.string.btnStartText)) }
+        buttonStateFlow.update { buttonStateFlow.value.copy(onClick = onClick, text = TextString.Res(R.string.btnStartText)) }
         composeTestRule.setContent {
             BreathingScreen(
                 titleFlow = titleFlow,
@@ -490,7 +490,7 @@ class BreathingScreenKtTest {
             )
         }
         // Act
-        buttonStateFlow.update { buttonStateFlow.value.copy(text = Text.TextRes(R.string.btnPauseText)) }
+        buttonStateFlow.update { buttonStateFlow.value.copy(text = TextString.Res(R.string.btnPauseText)) }
         // Assert
         composeTestRule.onNodeWithText(context.getString(R.string.btnStartText)).isNotDisplayed()
         composeTestRule.onNodeWithText(context.getString(R.string.btnPauseText)).isDisplayed()

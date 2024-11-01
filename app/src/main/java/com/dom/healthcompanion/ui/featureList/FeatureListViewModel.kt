@@ -20,7 +20,7 @@ class FeatureListViewModel
         init {
             _featureItems.value =
                 listOf(
-                    FeatureItem(R.string.feature_breathing) {
+                    FeatureItem(R.string.breathing_screen_title) {
                         navigator.navigateTo(NavItem.BREATHING)
                     },
                 )

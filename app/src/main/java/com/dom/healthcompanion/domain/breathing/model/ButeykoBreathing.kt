@@ -2,11 +2,11 @@ package com.dom.healthcompanion.domain.breathing.model
 
 import com.dom.healthcompanion.R
 import com.dom.healthcompanion.domain.breathing.model.BreathingExercise.Companion.OPEN_TIMER
-import com.dom.healthcompanion.utils.Text
+import com.dom.healthcompanion.utils.TextString
 import java.util.concurrent.TimeUnit
 
 class ButeykoBreathing : BreathingExercise {
-    override val title: Text.TextRes = Text.TextRes(R.string.buteyko_breathing_title)
+    override val title: TextString.Res = TextString.Res(R.string.buteyko_breathing_title)
     override val rounds: List<BreathingExercise.BreathingRound> =
         listOf(
             // First Round

@@ -39,14 +39,14 @@ class FeatureListViewModelTest {
     @Test
     fun `1- When initialized, then add Breathing feature item to feature list flow`() {
         // Assert
-        val breathingItem = sut.featureItems.value.firstOrNull { it.textRes == R.string.feature_breathing }
+        val breathingItem = sut.featureItems.value.firstOrNull { it.textRes == R.string.breathing_screen_title }
         assertThat(breathingItem, `is`(notNullValue()))
     }
 
     @Test
     fun `2- When Breathing feature item is clicked, then navigate to breathing screen`() {
         // Arrange
-        val breathingItem = sut.featureItems.value.first { it.textRes == R.string.feature_breathing }
+        val breathingItem = sut.featureItems.value.first { it.textRes == R.string.breathing_screen_title }
         justRun { navigator.navigateTo(NavItem.BREATHING) }
         // Act
         breathingItem.onClick.invoke()

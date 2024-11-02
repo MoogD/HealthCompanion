@@ -27,7 +27,7 @@ import com.dom.healthcompanion.domain.breathing.model.BreathingExercise
 import com.dom.healthcompanion.ui.TestTags
 import com.dom.healthcompanion.ui.theme.PurpleGrey80
 import com.dom.healthcompanion.utils.ButtonState
-import com.dom.healthcompanion.utils.Text
+import com.dom.healthcompanion.utils.TextString
 import com.dom.healthcompanion.utils.getAsString
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -35,7 +35,7 @@ import kotlinx.coroutines.flow.flowOf
 
 @Composable
 fun BreathingScreen(
-    titleFlow: Flow<Text>,
+    titleFlow: Flow<TextString>,
     timerStateFlow: Flow<TimerState>,
     startButtonStateFlow: Flow<ButtonState>,
     onStopClick: () -> Unit,
@@ -50,8 +50,8 @@ fun BreathingScreen(
                     0f,
                 ),
         )
-    val title = titleFlow.collectAsState(initial = Text.TextRes(R.string.breathing_screen_default_title))
-    val buttonState = startButtonStateFlow.collectAsState(initial = ButtonState(Text.TextRes(R.string.btnStartText), {}))
+    val title = titleFlow.collectAsState(initial = TextString.Res(R.string.breathing_screen_default_title))
+    val buttonState = startButtonStateFlow.collectAsState(initial = ButtonState(TextString.Res(R.string.btnStartText), {}))
     ConstraintLayout(
         modifier =
             Modifier
@@ -188,7 +188,7 @@ fun ListItem(data: TimerLap) {
 @Composable
 fun BreathingScreenPreview() {
     BreathingScreen(
-        titleFlow = flowOf(Text.TextRes(R.string.buteyko_breathing_title)),
+        titleFlow = flowOf(TextString.Res(R.string.buteyko_breathing_title)),
         timerStateFlow =
             MutableStateFlow(
                 TimerState(
@@ -198,7 +198,7 @@ fun BreathingScreenPreview() {
                     0.5f,
                 ),
             ),
-        startButtonStateFlow = flowOf(ButtonState(Text.TextRes(R.string.btnStartText), {})),
+        startButtonStateFlow = flowOf(ButtonState(TextString.Res(R.string.btnStartText), {})),
         onStopClick = {},
     )
 }

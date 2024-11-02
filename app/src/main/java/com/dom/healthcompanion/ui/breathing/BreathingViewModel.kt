@@ -8,7 +8,7 @@ import com.dom.healthcompanion.domain.breathing.model.BreathingExercise
 import com.dom.healthcompanion.domain.breathing.usecase.GetCurrentBreathingExerciseUseCase
 import com.dom.healthcompanion.domain.breathing.model.BreathingExercise.Companion.OPEN_TIMER
 import com.dom.healthcompanion.utils.ButtonState
-import com.dom.healthcompanion.utils.Text
+import com.dom.healthcompanion.utils.TextString
 import com.dom.logger.Logger
 import com.dom.timer.CountUpTimer
 import com.dom.timer.CountUpTimerImpl
@@ -61,7 +61,7 @@ class BreathingViewModel
             get() = _buttonStateFlow
 
         private val _titleFlow = MutableStateFlow(currentExercise.title)
-        val titleFlow: StateFlow<Text>
+        val titleFlow: StateFlow<TextString>
             get() = _titleFlow
         // endregion
 
@@ -97,12 +97,12 @@ class BreathingViewModel
         private fun onPauseClicked() {
             timer?.pause()
             logger.d("next button clicked with ${timer?.time} trackedTime")
-            _buttonStateFlow.value = ButtonState(Text.TextRes(R.string.btnResumeText), ::onResumeClicked)
+            _buttonStateFlow.value = ButtonState(TextString.Res(R.string.btnResumeText), ::onResumeClicked)
             logger.d("buttonstate changed to resume state")
         }
 
         private fun onResumeClicked() {
-            _buttonStateFlow.value = ButtonState(Text.TextRes(R.string.btnPauseText), ::onPauseClicked)
+            _buttonStateFlow.value = ButtonState(TextString.Res(R.string.btnPauseText), ::onPauseClicked)
             logger.d("next button clicked with ${timer?.time} trackedTime. Show onPause button state.")
             timer?.resume()
         }
@@ -111,7 +111,7 @@ class BreathingViewModel
         // region timer functions
         private fun onTick(time: Long) {
             // show next button if not open timer but next round needs to be started by user
-            val isNextButtonShown = (_buttonStateFlow.value.text as Text.TextRes).resId == R.string.btnNextText
+            val isNextButtonShown = (_buttonStateFlow.value.text as TextString.Res).resId == R.string.btnNextText
             if (!isNextButtonShown && currentRound.expectedTime != OPEN_TIMER && time >= currentRound.expectedTime) {
                 logger.d("expected time exceeded and next round does not start automatically.")
                 updateButtonState(trackedTime = time)
@@ -185,33 +185,33 @@ class BreathingViewModel
             return when {
                 // Timer was not started
                 timer == null && currentExercise.currenRoundIndex == 0 ->
-                    ButtonState(Text.TextRes(R.string.btnStartText), ::onStartClicked)
+                    ButtonState(TextString.Res(R.string.btnStartText), ::onStartClicked)
 
                 // TODO: handle timer was started but canceled
 
                 // Timer is active but user needs to start next round but current round is not done yet
                 !isExpectedTimeDone && currentExercise.hasNextRound && !currentExercise.doesNextRoundStartAutomatically ->
-                    ButtonState(Text.TextRes(R.string.btnPauseText), ::onPauseClicked)
+                    ButtonState(TextString.Res(R.string.btnPauseText), ::onPauseClicked)
 
                 // Timer is active but user needs to start next round
                 isExpectedTimeDone && currentExercise.hasNextRound && !currentExercise.doesNextRoundStartAutomatically ->
-                    ButtonState(Text.TextRes(R.string.btnNextText), ::onNextClicked)
+                    ButtonState(TextString.Res(R.string.btnNextText), ::onNextClicked)
 
                 // Timer is active and current round does not end automatically
                 isOpenTimer ->
-                    ButtonState(Text.TextRes(R.string.btnNextText), ::onNextClicked)
+                    ButtonState(TextString.Res(R.string.btnNextText), ::onNextClicked)
 
                 // Timer is active and next round starts automatically or there is no next round
                 currentExercise.doesNextRoundStartAutomatically ->
-                    ButtonState(Text.TextRes(R.string.btnPauseText), ::onPauseClicked)
+                    ButtonState(TextString.Res(R.string.btnPauseText), ::onPauseClicked)
 
                 // Timer is active and there is no next round and current round just started and ends automatically
                 !currentExercise.hasNextRound && isNewRound ->
-                    ButtonState(Text.TextRes(R.string.btnPauseText), ::onPauseClicked)
+                    ButtonState(TextString.Res(R.string.btnPauseText), ::onPauseClicked)
 
                 // Exercise is done
                 else -> {
-                    ButtonState(Text.TextRes(R.string.btnStartText), ::onStartClicked)
+                    ButtonState(TextString.Res(R.string.btnStartText), ::onStartClicked)
                 }
             }
         }

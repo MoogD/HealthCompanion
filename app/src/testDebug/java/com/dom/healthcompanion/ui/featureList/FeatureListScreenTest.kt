@@ -53,7 +53,7 @@ class FeatureListScreenTest {
         val featureFlow =
             flowOf(
                 listOf(
-                    FeatureItem(R.string.feature_breathing) {},
+                    FeatureItem(R.string.breathing_screen_title) {},
                     FeatureItem(R.string.btnNextText) {},
                     FeatureItem(R.string.app_name) {},
                 ),
@@ -63,7 +63,7 @@ class FeatureListScreenTest {
             FeatureListScreen(featureFlow)
         }
         // Assert
-        composeTestRule.onNodeWithText(context.getString(R.string.feature_breathing)).assertIsDisplayed()
+        composeTestRule.onNodeWithText(context.getString(R.string.breathing_screen_title)).assertIsDisplayed()
         composeTestRule.onNodeWithText(context.getString(R.string.btnNextText)).assertIsDisplayed()
         composeTestRule.onNodeWithText(context.getString(R.string.app_name)).assertIsDisplayed()
         val rowCount = composeTestRule.onAllNodesWithTag("featureItem").fetchSemanticsNodes().size
@@ -75,7 +75,7 @@ class FeatureListScreenTest {
         // Arrange
         val items =
             listOf(
-                FeatureItem(R.string.feature_breathing) {},
+                FeatureItem(R.string.breathing_screen_title) {},
                 FeatureItem(R.string.btnNextText) {},
                 FeatureItem(R.string.app_name) {},
             )
@@ -83,7 +83,7 @@ class FeatureListScreenTest {
         composeTestRule.setContent {
             FeatureListScreen(featureFlow)
         }
-        composeTestRule.onNodeWithText(context.getString(R.string.feature_breathing)).assertIsDisplayed()
+        composeTestRule.onNodeWithText(context.getString(R.string.breathing_screen_title)).assertIsDisplayed()
         composeTestRule.onNodeWithText(context.getString(R.string.btnNextText)).assertIsDisplayed()
         composeTestRule.onNodeWithText(context.getString(R.string.app_name)).assertIsDisplayed()
         // Act
@@ -91,7 +91,7 @@ class FeatureListScreenTest {
         updatedList.removeLast()
         featureFlow.update { updatedList }
         // Assert
-        composeTestRule.onNodeWithText(context.getString(R.string.feature_breathing)).assertIsDisplayed()
+        composeTestRule.onNodeWithText(context.getString(R.string.breathing_screen_title)).assertIsDisplayed()
         composeTestRule.onNodeWithText(context.getString(R.string.btnNextText)).assertIsDisplayed()
         composeTestRule.onNodeWithText(context.getString(R.string.app_name)).assertIsNotDisplayed()
         val rowCount = composeTestRule.onAllNodesWithTag("featureItem").fetchSemanticsNodes().size
@@ -103,7 +103,7 @@ class FeatureListScreenTest {
         // Arrange
         val items =
             listOf(
-                FeatureItem(R.string.feature_breathing) {},
+                FeatureItem(R.string.breathing_screen_title) {},
                 FeatureItem(R.string.btnNextText) {},
                 FeatureItem(R.string.app_name) {},
             )
@@ -116,7 +116,7 @@ class FeatureListScreenTest {
         updatedList.add(FeatureItem(R.string.btnPauseText) {})
         featureFlow.update { updatedList }
         // Assert
-        composeTestRule.onNodeWithText(context.getString(R.string.feature_breathing)).assertIsDisplayed()
+        composeTestRule.onNodeWithText(context.getString(R.string.breathing_screen_title)).assertIsDisplayed()
         composeTestRule.onNodeWithText(context.getString(R.string.btnNextText)).assertIsDisplayed()
         composeTestRule.onNodeWithText(context.getString(R.string.app_name)).assertIsDisplayed()
         composeTestRule.onNodeWithText(context.getString(R.string.btnPauseText)).assertIsDisplayed()
@@ -129,7 +129,7 @@ class FeatureListScreenTest {
         // Arrange
         val items =
             listOf(
-                FeatureItem(R.string.feature_breathing) {},
+                FeatureItem(R.string.breathing_screen_title) {},
                 FeatureItem(R.string.btnNextText) {},
                 FeatureItem(R.string.app_name) {},
             )
@@ -143,7 +143,7 @@ class FeatureListScreenTest {
         updatedList.add(FeatureItem(R.string.btnPauseText) {})
         featureFlow.update { updatedList }
         // Assert
-        composeTestRule.onNodeWithText(context.getString(R.string.feature_breathing)).assertIsDisplayed()
+        composeTestRule.onNodeWithText(context.getString(R.string.breathing_screen_title)).assertIsDisplayed()
         composeTestRule.onNodeWithText(context.getString(R.string.btnNextText)).assertIsDisplayed()
         composeTestRule.onNodeWithText(context.getString(R.string.app_name)).assertIsNotDisplayed()
         composeTestRule.onNodeWithText(context.getString(R.string.btnPauseText)).assertIsDisplayed()
@@ -156,7 +156,7 @@ class FeatureListScreenTest {
         // Arrange
         val items =
             listOf(
-                FeatureItem(R.string.feature_breathing) {},
+                FeatureItem(R.string.breathing_screen_title) {},
                 FeatureItem(R.string.btnNextText) {},
                 FeatureItem(R.string.app_name) {},
             )
@@ -182,7 +182,7 @@ class FeatureListScreenTest {
         var fourthItemClickCount = 0
         val items =
             listOf(
-                FeatureItem(R.string.feature_breathing) { firstItemClickCount++ },
+                FeatureItem(R.string.breathing_screen_title) { firstItemClickCount++ },
                 FeatureItem(R.string.btnNextText) { secondItemClickCount++ },
                 FeatureItem(R.string.app_name) { thirdItemClickCount++ },
                 FeatureItem(R.string.btnPauseText) { fourthItemClickCount++ },
@@ -192,7 +192,7 @@ class FeatureListScreenTest {
             FeatureListScreen(featureFlow)
         }
         // Act
-        composeTestRule.onNodeWithText(context.getString(R.string.feature_breathing)).performClick()
+        composeTestRule.onNodeWithText(context.getString(R.string.breathing_screen_title)).performClick()
         composeTestRule.onNodeWithText(context.getString(R.string.btnNextText)).performClick()
         composeTestRule.onNodeWithText(context.getString(R.string.btnPauseText)).performClick()
 

@@ -126,6 +126,7 @@ kover {
         filters {
             excludes {
                 classes(
+                    "*BuildConfig",
                     // exclude DI
                     "dagger.hilt.internal.aggregatedroot.codegen.*",
                     "hilt_aggregated_deps.*",
@@ -137,8 +138,8 @@ kover {
                     "*ComposableSingletons*",
                     // exclude ui specifics
                     "com.dom.healthcompanion.ui.theme.*",
-                    "com.dom.healthcompanion.ui.HealthCompanionApplication",
-                    "com.dom.healthcompanion.ui.main.MainActivity",
+                    "com.dom.healthcompanion.HealthCompanionApplication",
+                    "com.dom.healthcompanion.ui.main.MainActivity*",
                 )
                 annotatedBy("androidx.compose.ui.tooling.preview.Preview")
             }

@@ -1,7 +1,9 @@
 <resources>
     <string name="app_name">HealthCompanion</string>
 
-    <string name="feature_breathing">Breathing</string>
+    <!-- screen names -->
+    <string name="breathing_screen_title">Breathing</string>
+    <string name="feature_list_screen_title">Features</string>
     <string name="breathing_screen_default_title">Breathing exercise</string>
     <string name="buteyko_breathing_title">Buteyko Breathing</string>
 

@@ -10,7 +10,7 @@ import com.dom.healthcompanion.R
 import com.dom.healthcompanion.domain.breathing.model.BreathingExercise
 import com.dom.healthcompanion.domain.breathing.model.ButeykoBreathing
 import com.dom.healthcompanion.domain.breathing.usecase.GetCurrentBreathingExerciseUseCase
-import com.dom.healthcompanion.utils.Text
+import com.dom.healthcompanion.utils.TextString
 import com.dom.logger.Logger
 import com.dom.testUtils.TestDispatcherProvider
 import com.dom.timer.CountUpTimer
@@ -139,7 +139,7 @@ class BreathingViewModelTest {
         fun `3- When initialized, then show start button state`() {
             // Assert
             val buttonState = sut.buttonStateFlow.value
-            assertThat(buttonState.text, `is`(Text.TextRes(R.string.btnStartText)))
+            assertThat(buttonState.text, `is`(TextString.Res(R.string.btnStartText)))
         }
     }
 
@@ -153,7 +153,7 @@ class BreathingViewModelTest {
                 mockkConstructor(CountUpTimerImpl::class)
                 val expectedExercise =
                     object : BreathingExercise {
-                        override val title: Text = Text.TextRes(R.string.buteyko_breathing_title)
+                        override val title: TextString = TextString.Res(R.string.buteyko_breathing_title)
                         override val rounds: List<BreathingExercise.BreathingRound> =
                             listOf(
                                 BreathingExercise.BreathingRound(
@@ -195,7 +195,7 @@ class BreathingViewModelTest {
                 mockkConstructor(CountUpTimerImpl::class)
                 val expectedExercise =
                     object : BreathingExercise {
-                        override val title: Text = Text.TextRes(R.string.buteyko_breathing_title)
+                        override val title: TextString = TextString.Res(R.string.buteyko_breathing_title)
                         override val rounds: List<BreathingExercise.BreathingRound> =
                             listOf(
                                 BreathingExercise.BreathingRound(
@@ -236,7 +236,7 @@ class BreathingViewModelTest {
             mockkConstructor(CountUpTimerImpl::class)
             val expectedExercise =
                 object : BreathingExercise {
-                    override val title: Text = Text.TextRes(R.string.buteyko_breathing_title)
+                    override val title: TextString = TextString.Res(R.string.buteyko_breathing_title)
                     override val rounds: List<BreathingExercise.BreathingRound> =
                         listOf(
                             BreathingExercise.BreathingRound(
@@ -282,7 +282,7 @@ class BreathingViewModelTest {
             mockkConstructor(CountUpTimerImpl::class)
             val expectedExercise =
                 object : BreathingExercise {
-                    override val title: Text = Text.TextRes(R.string.buteyko_breathing_title)
+                    override val title: TextString = TextString.Res(R.string.buteyko_breathing_title)
                     override val rounds: List<BreathingExercise.BreathingRound> =
                         listOf(
                             BreathingExercise.BreathingRound(
@@ -328,7 +328,7 @@ class BreathingViewModelTest {
                 mockkConstructor(CountUpTimerImpl::class)
                 val expectedExercise =
                     object : BreathingExercise {
-                        override val title: Text = Text.TextRes(R.string.buteyko_breathing_title)
+                        override val title: TextString = TextString.Res(R.string.buteyko_breathing_title)
                         override val rounds: List<BreathingExercise.BreathingRound> =
                             listOf(
                                 BreathingExercise.BreathingRound(
@@ -352,7 +352,7 @@ class BreathingViewModelTest {
                     // Act
                     sut.buttonStateFlow.value.onClick.invoke()
                     // Assert
-                    assertThat(awaitItem().text, `is`(Text.TextRes(R.string.btnPauseText)))
+                    assertThat(awaitItem().text, `is`(TextString.Res(R.string.btnPauseText)))
                 }
             }
 
@@ -363,7 +363,7 @@ class BreathingViewModelTest {
                 mockkConstructor(CountUpTimerImpl::class)
                 val expectedExercise =
                     object : BreathingExercise {
-                        override val title: Text = Text.TextRes(R.string.buteyko_breathing_title)
+                        override val title: TextString = TextString.Res(R.string.buteyko_breathing_title)
                         override val rounds: List<BreathingExercise.BreathingRound> =
                             listOf(
                                 BreathingExercise.BreathingRound(
@@ -387,7 +387,7 @@ class BreathingViewModelTest {
                     // Act
                     sut.buttonStateFlow.value.onClick.invoke()
                     // Assert
-                    assertThat(awaitItem().text, `is`(Text.TextRes(R.string.btnNextText)))
+                    assertThat(awaitItem().text, `is`(TextString.Res(R.string.btnNextText)))
                 }
             }
 
@@ -398,7 +398,7 @@ class BreathingViewModelTest {
                 mockkConstructor(CountUpTimerImpl::class)
                 val expectedExercise =
                     object : BreathingExercise {
-                        override val title: Text = Text.TextRes(R.string.buteyko_breathing_title)
+                        override val title: TextString = TextString.Res(R.string.buteyko_breathing_title)
                         override val rounds: List<BreathingExercise.BreathingRound> =
                             listOf(
                                 BreathingExercise.BreathingRound(
@@ -422,7 +422,7 @@ class BreathingViewModelTest {
                     // Act
                     sut.buttonStateFlow.value.onClick.invoke()
                     // Assert
-                    assertThat(awaitItem().text, `is`(Text.TextRes(R.string.btnPauseText)))
+                    assertThat(awaitItem().text, `is`(TextString.Res(R.string.btnPauseText)))
                 }
             }
 
@@ -433,7 +433,7 @@ class BreathingViewModelTest {
                 mockkConstructor(CountUpTimerImpl::class)
                 val expectedExercise =
                     object : BreathingExercise {
-                        override val title: Text = Text.TextRes(R.string.buteyko_breathing_title)
+                        override val title: TextString = TextString.Res(R.string.buteyko_breathing_title)
                         override val rounds: List<BreathingExercise.BreathingRound> =
                             listOf(
                                 BreathingExercise.BreathingRound(
@@ -452,7 +452,7 @@ class BreathingViewModelTest {
                     // Act
                     sut.buttonStateFlow.value.onClick.invoke()
                     // Assert
-                    assertThat(awaitItem().text, `is`(Text.TextRes(R.string.btnNextText)))
+                    assertThat(awaitItem().text, `is`(TextString.Res(R.string.btnNextText)))
                 }
             }
 
@@ -463,7 +463,7 @@ class BreathingViewModelTest {
                 mockkConstructor(CountUpTimerImpl::class)
                 val expectedExercise =
                     object : BreathingExercise {
-                        override val title: Text = Text.TextRes(R.string.buteyko_breathing_title)
+                        override val title: TextString = TextString.Res(R.string.buteyko_breathing_title)
                         override val rounds: List<BreathingExercise.BreathingRound> =
                             listOf(
                                 BreathingExercise.BreathingRound(
@@ -482,7 +482,7 @@ class BreathingViewModelTest {
                     // Act
                     sut.buttonStateFlow.value.onClick.invoke()
                     // Assert
-                    assertThat(awaitItem().text, `is`(Text.TextRes(R.string.btnPauseText)))
+                    assertThat(awaitItem().text, `is`(TextString.Res(R.string.btnPauseText)))
                 }
             }
 
@@ -495,7 +495,7 @@ class BreathingViewModelTest {
                 justRun { anyConstructed<CountUpTimerImpl>().setListener(capture(listenerSlot)) }
                 val expectedExercise =
                     object : BreathingExercise {
-                        override val title: Text = Text.TextRes(R.string.buteyko_breathing_title)
+                        override val title: TextString = TextString.Res(R.string.buteyko_breathing_title)
                         override val rounds: List<BreathingExercise.BreathingRound> =
                             listOf(
                                 BreathingExercise.BreathingRound(
@@ -550,7 +550,7 @@ class BreathingViewModelTest {
                 every { anyConstructed<CountUpTimerImpl>().stop() } returns 0
                 val expectedExercise =
                     object : BreathingExercise {
-                        override val title: Text = Text.TextRes(R.string.buteyko_breathing_title)
+                        override val title: TextString = TextString.Res(R.string.buteyko_breathing_title)
                         override val rounds: List<BreathingExercise.BreathingRound> =
                             listOf(
                                 BreathingExercise.BreathingRound(
@@ -587,7 +587,7 @@ class BreathingViewModelTest {
                 justRun { anyConstructed<CountUpTimerImpl>().start() }
                 val expectedExercise =
                     object : BreathingExercise {
-                        override val title: Text = Text.TextRes(R.string.buteyko_breathing_title)
+                        override val title: TextString = TextString.Res(R.string.buteyko_breathing_title)
                         override val rounds: List<BreathingExercise.BreathingRound> =
                             listOf(
                                 BreathingExercise.BreathingRound(
@@ -628,7 +628,7 @@ class BreathingViewModelTest {
                 justRun { anyConstructed<CountUpTimerImpl>().setListener(capture(timerListenerSlot)) }
                 val expectedExercise =
                     object : BreathingExercise {
-                        override val title: Text = Text.TextRes(R.string.buteyko_breathing_title)
+                        override val title: TextString = TextString.Res(R.string.buteyko_breathing_title)
                         override val rounds: List<BreathingExercise.BreathingRound> =
                             listOf(
                                 BreathingExercise.BreathingRound(
@@ -685,7 +685,7 @@ class BreathingViewModelTest {
                 val initialIndex = 0
                 val expectedExercise =
                     object : BreathingExercise {
-                        override val title: Text = Text.TextRes(R.string.buteyko_breathing_title)
+                        override val title: TextString = TextString.Res(R.string.buteyko_breathing_title)
                         override val rounds: List<BreathingExercise.BreathingRound> = listOf(currentRound, nextRound)
                         override var currenRoundIndex: Int = initialIndex
                     }
@@ -734,7 +734,7 @@ class BreathingViewModelTest {
                     )
                 val expectedExercise =
                     object : BreathingExercise {
-                        override val title: Text = Text.TextRes(R.string.buteyko_breathing_title)
+                        override val title: TextString = TextString.Res(R.string.buteyko_breathing_title)
                         override val rounds: List<BreathingExercise.BreathingRound> = listOf(currentRound)
                         override var currenRoundIndex: Int = 0
                     }
@@ -749,7 +749,7 @@ class BreathingViewModelTest {
                 val timerState = sut.timerStateFlow.value
                 assertThat(timerState.type, `is`(BreathingExercise.RoundType.FINISHED))
                 assertThat(timerState.currentTimeText, `is`(BreathingViewModel.STARTING_TIME_STRING))
-                assertThat(sut.buttonStateFlow.value.text, `is`(Text.TextRes(R.string.btnStartText)))
+                assertThat(sut.buttonStateFlow.value.text, `is`(TextString.Res(R.string.btnStartText)))
             }
 
         @Test
@@ -772,7 +772,7 @@ class BreathingViewModelTest {
                     )
                 val expectedExercise =
                     object : BreathingExercise {
-                        override val title: Text = Text.TextRes(R.string.buteyko_breathing_title)
+                        override val title: TextString = TextString.Res(R.string.buteyko_breathing_title)
                         override val rounds: List<BreathingExercise.BreathingRound> = listOf(currentRound, nextRound)
                         override var currenRoundIndex: Int = 0
                     }
@@ -784,7 +784,7 @@ class BreathingViewModelTest {
                 sut.buttonStateFlow.value.onClick()
 
                 // Assert
-                assertThat(sut.buttonStateFlow.value.text, `is`(Text.TextRes(R.string.btnNextText)))
+                assertThat(sut.buttonStateFlow.value.text, `is`(TextString.Res(R.string.btnNextText)))
             }
 
         @Test
@@ -807,7 +807,7 @@ class BreathingViewModelTest {
                     )
                 val expectedExercise =
                     object : BreathingExercise {
-                        override val title: Text = Text.TextRes(R.string.buteyko_breathing_title)
+                        override val title: TextString = TextString.Res(R.string.buteyko_breathing_title)
                         override val rounds: List<BreathingExercise.BreathingRound> = listOf(currentRound, nextRound)
                         override var currenRoundIndex: Int = 0
                     }
@@ -819,7 +819,7 @@ class BreathingViewModelTest {
                 sut.buttonStateFlow.value.onClick()
 
                 // Assert
-                assertThat(sut.buttonStateFlow.value.text, `is`(Text.TextRes(R.string.btnPauseText)))
+                assertThat(sut.buttonStateFlow.value.text, `is`(TextString.Res(R.string.btnPauseText)))
             }
     }
 
@@ -850,7 +850,7 @@ class BreathingViewModelTest {
                 val initialIndex = 0
                 val expectedExercise =
                     object : BreathingExercise {
-                        override val title: Text = Text.TextRes(R.string.buteyko_breathing_title)
+                        override val title: TextString = TextString.Res(R.string.buteyko_breathing_title)
                         override val rounds: List<BreathingExercise.BreathingRound> = listOf(currentRound, nextRound)
                         override var currenRoundIndex: Int = initialIndex
                     }
@@ -861,7 +861,7 @@ class BreathingViewModelTest {
                 // Act
                 timerListenerSlot.captured.onTick(endTime)
                 // Assert
-                assertThat(sut.buttonStateFlow.value.text, `is`(Text.TextRes(R.string.btnNextText)))
+                assertThat(sut.buttonStateFlow.value.text, `is`(TextString.Res(R.string.btnNextText)))
                 verify { mockVibrationHelper.vibrate(VibrationHelper.VibrationType.NOTIFY_USER) }
                 verify { mockSoundPlayer.play(R.raw.hero_simple_celebration_03) }
             }
@@ -890,7 +890,7 @@ class BreathingViewModelTest {
                 val initialIndex = 0
                 val expectedExercise =
                     object : BreathingExercise {
-                        override val title: Text = Text.TextRes(R.string.buteyko_breathing_title)
+                        override val title: TextString = TextString.Res(R.string.buteyko_breathing_title)
                         override val rounds: List<BreathingExercise.BreathingRound> = listOf(currentRound, nextRound)
                         override var currenRoundIndex: Int = initialIndex
                     }
@@ -939,7 +939,7 @@ class BreathingViewModelTest {
                 val initialIndex = 0
                 val expectedExercise =
                     object : BreathingExercise {
-                        override val title: Text = Text.TextRes(R.string.buteyko_breathing_title)
+                        override val title: TextString = TextString.Res(R.string.buteyko_breathing_title)
                         override val rounds: List<BreathingExercise.BreathingRound> = listOf(currentRound, nextRound)
                         override var currenRoundIndex: Int = initialIndex
                     }
@@ -984,7 +984,7 @@ class BreathingViewModelTest {
                 val initialIndex = 0
                 val expectedExercise =
                     object : BreathingExercise {
-                        override val title: Text = Text.TextRes(R.string.buteyko_breathing_title)
+                        override val title: TextString = TextString.Res(R.string.buteyko_breathing_title)
                         override val rounds: List<BreathingExercise.BreathingRound> = listOf(currentRound, nextRound)
                         override var currenRoundIndex: Int = initialIndex
                     }
@@ -1027,7 +1027,7 @@ class BreathingViewModelTest {
                 val initialIndex = 0
                 val expectedExercise =
                     object : BreathingExercise {
-                        override val title: Text = Text.TextRes(R.string.buteyko_breathing_title)
+                        override val title: TextString = TextString.Res(R.string.buteyko_breathing_title)
                         override val rounds: List<BreathingExercise.BreathingRound> = listOf(firstRound, nextRound)
                         override var currenRoundIndex: Int = initialIndex
                     }
@@ -1069,7 +1069,7 @@ class BreathingViewModelTest {
                 val initialIndex = 0
                 val expectedExercise =
                     object : BreathingExercise {
-                        override val title: Text = Text.TextRes(R.string.buteyko_breathing_title)
+                        override val title: TextString = TextString.Res(R.string.buteyko_breathing_title)
                         override val rounds: List<BreathingExercise.BreathingRound> = listOf(firstRound, nextRound)
                         override var currenRoundIndex: Int = initialIndex
                     }
@@ -1118,7 +1118,7 @@ class BreathingViewModelTest {
                 )
                 val expectedExercise =
                     object : BreathingExercise {
-                        override val title: Text = Text.TextRes(R.string.buteyko_breathing_title)
+                        override val title: TextString = TextString.Res(R.string.buteyko_breathing_title)
                         override val rounds: List<BreathingExercise.BreathingRound> = rounds
                         override var currenRoundIndex: Int = 0
                     }
@@ -1154,7 +1154,7 @@ class BreathingViewModelTest {
                 justRun { anyConstructed<CountUpTimerImpl>().setListener(capture(listenerSlot)) }
                 val expectedExercise =
                     object : BreathingExercise {
-                        override val title: Text = Text.TextRes(R.string.buteyko_breathing_title)
+                        override val title: TextString = TextString.Res(R.string.buteyko_breathing_title)
                         override val rounds: List<BreathingExercise.BreathingRound> =
                             listOf(
                                 BreathingExercise.BreathingRound(
@@ -1195,7 +1195,7 @@ class BreathingViewModelTest {
                 justRun { anyConstructed<CountUpTimerImpl>().setListener(capture(timerListenerSlot)) }
                 val expectedExercise =
                     object : BreathingExercise {
-                        override val title: Text = Text.TextRes(R.string.buteyko_breathing_title)
+                        override val title: TextString = TextString.Res(R.string.buteyko_breathing_title)
                         override val rounds: List<BreathingExercise.BreathingRound> =
                             listOf(
                                 BreathingExercise.BreathingRound(
@@ -1250,7 +1250,7 @@ class BreathingViewModelTest {
                 val initialIndex = 0
                 val expectedExercise =
                     object : BreathingExercise {
-                        override val title: Text = Text.TextRes(R.string.buteyko_breathing_title)
+                        override val title: TextString = TextString.Res(R.string.buteyko_breathing_title)
                         override val rounds: List<BreathingExercise.BreathingRound> = listOf(currentRound, nextRound)
                         override var currenRoundIndex: Int = initialIndex
                     }
@@ -1300,7 +1300,7 @@ class BreathingViewModelTest {
                     )
                 val expectedExercise =
                     object : BreathingExercise {
-                        override val title: Text = Text.TextRes(R.string.buteyko_breathing_title)
+                        override val title: TextString = TextString.Res(R.string.buteyko_breathing_title)
                         override val rounds: List<BreathingExercise.BreathingRound> = listOf(currentRound)
                         override var currenRoundIndex: Int = 0
                     }
@@ -1315,7 +1315,7 @@ class BreathingViewModelTest {
                 val timerState = sut.timerStateFlow.value
                 assertThat(timerState.type, `is`(BreathingExercise.RoundType.FINISHED))
                 assertThat(timerState.currentTimeText, `is`(BreathingViewModel.STARTING_TIME_STRING))
-                assertThat(sut.buttonStateFlow.value.text, `is`(Text.TextRes(R.string.btnStartText)))
+                assertThat(sut.buttonStateFlow.value.text, `is`(TextString.Res(R.string.btnStartText)))
             }
 
         @Test
@@ -1340,7 +1340,7 @@ class BreathingViewModelTest {
                     )
                 val expectedExercise =
                     object : BreathingExercise {
-                        override val title: Text = Text.TextRes(R.string.buteyko_breathing_title)
+                        override val title: TextString = TextString.Res(R.string.buteyko_breathing_title)
                         override val rounds: List<BreathingExercise.BreathingRound> = listOf(currentRound, nextRound)
                         override var currenRoundIndex: Int = 0
                     }
@@ -1352,7 +1352,7 @@ class BreathingViewModelTest {
                 listenerSlot.captured.onFinish(passedTime)
 
                 // Assert
-                assertThat(sut.buttonStateFlow.value.text, `is`(Text.TextRes(R.string.btnNextText)))
+                assertThat(sut.buttonStateFlow.value.text, `is`(TextString.Res(R.string.btnNextText)))
             }
 
         @Test
@@ -1377,7 +1377,7 @@ class BreathingViewModelTest {
                     )
                 val expectedExercise =
                     object : BreathingExercise {
-                        override val title: Text = Text.TextRes(R.string.buteyko_breathing_title)
+                        override val title: TextString = TextString.Res(R.string.buteyko_breathing_title)
                         override val rounds: List<BreathingExercise.BreathingRound> = listOf(currentRound, nextRound)
                         override var currenRoundIndex: Int = 0
                     }
@@ -1389,7 +1389,7 @@ class BreathingViewModelTest {
                 listenerSlot.captured.onFinish(passedTime)
 
                 // Assert
-                assertThat(sut.buttonStateFlow.value.text, `is`(Text.TextRes(R.string.btnPauseText)))
+                assertThat(sut.buttonStateFlow.value.text, `is`(TextString.Res(R.string.btnPauseText)))
             }
 
         @Test
@@ -1432,7 +1432,7 @@ class BreathingViewModelTest {
                     )
                 val expectedExercise =
                     object : BreathingExercise {
-                        override val title: Text = Text.TextRes(R.string.buteyko_breathing_title)
+                        override val title: TextString = TextString.Res(R.string.buteyko_breathing_title)
                         override val rounds: List<BreathingExercise.BreathingRound> = listOf(currentRound)
                         override var currenRoundIndex: Int = 0
                     }
@@ -1496,7 +1496,7 @@ class BreathingViewModelTest {
             justRun { anyConstructed<CountUpTimerImpl>().pause() }
             val expectedExercise =
                 object : BreathingExercise {
-                    override val title: Text = Text.TextRes(R.string.buteyko_breathing_title)
+                    override val title: TextString = TextString.Res(R.string.buteyko_breathing_title)
                     override val rounds: List<BreathingExercise.BreathingRound> =
                         listOf(
                             BreathingExercise.BreathingRound(
@@ -1522,7 +1522,7 @@ class BreathingViewModelTest {
                 // Act
                 sut.buttonStateFlow.value.onClick.invoke()
                 // Assert
-                assertThat(awaitItem().text, `is`(Text.TextRes(R.string.btnResumeText)))
+                assertThat(awaitItem().text, `is`(TextString.Res(R.string.btnResumeText)))
                 verify { anyConstructed<CountUpTimerImpl>().pause() }
             }
         }
@@ -1536,7 +1536,7 @@ class BreathingViewModelTest {
             justRun { anyConstructed<CountUpTimerImpl>().resume() }
             val expectedExercise =
                 object : BreathingExercise {
-                    override val title: Text = Text.TextRes(R.string.buteyko_breathing_title)
+                    override val title: TextString = TextString.Res(R.string.buteyko_breathing_title)
                     override val rounds: List<BreathingExercise.BreathingRound> =
                         listOf(
                             BreathingExercise.BreathingRound(
@@ -1564,7 +1564,7 @@ class BreathingViewModelTest {
                 // Act
                 sut.buttonStateFlow.value.onClick.invoke()
                 // Assert
-                assertThat(awaitItem().text, `is`(Text.TextRes(R.string.btnPauseText)))
+                assertThat(awaitItem().text, `is`(TextString.Res(R.string.btnPauseText)))
                 verify { anyConstructed<CountUpTimerImpl>().resume() }
             }
         }
@@ -1579,7 +1579,7 @@ class BreathingViewModelTest {
                 mockkConstructor(CountUpTimerImpl::class)
                 val expectedExercise =
                     object : BreathingExercise {
-                        override val title: Text = Text.TextRes(R.string.buteyko_breathing_title)
+                        override val title: TextString = TextString.Res(R.string.buteyko_breathing_title)
                         override val rounds: List<BreathingExercise.BreathingRound> =
                             listOf(
                                 BreathingExercise.BreathingRound(
@@ -1611,7 +1611,7 @@ class BreathingViewModelTest {
                 assertThat(timerState.laps.size, `is`(0))
                 // verify button state
                 val buttonState = sut.buttonStateFlow.value
-                assertThat(buttonState.text, `is`(Text.TextRes(R.string.btnStartText)))
+                assertThat(buttonState.text, `is`(TextString.Res(R.string.btnStartText)))
             }
 
         @ParameterizedTest
@@ -1626,7 +1626,7 @@ class BreathingViewModelTest {
                 justRun { anyConstructed<CountUpTimerImpl>().setListener(any()) }
                 val expectedExercise =
                     object : BreathingExercise {
-                        override val title: Text = Text.TextRes(R.string.buteyko_breathing_title)
+                        override val title: TextString = TextString.Res(R.string.buteyko_breathing_title)
                         override val rounds: List<BreathingExercise.BreathingRound> =
                             listOf(
                                 // use round to show next button first
@@ -1675,7 +1675,7 @@ class BreathingViewModelTest {
                 // capture listener to check correct listener removed
                 verify { anyConstructed<CountUpTimerImpl>().setListener(capture(listenerSlot)) }
                 // change current round and trigger new round
-                assertThat(sut.buttonStateFlow.value.text, `is`(Text.TextRes(R.string.btnNextText)))
+                assertThat(sut.buttonStateFlow.value.text, `is`(TextString.Res(R.string.btnNextText)))
                 expectedExercise.currenRoundIndex = currentRoundIndex
                 sut.buttonStateFlow.value.onClick()
                 clearConstructorMockk(CountUpTimerImpl::class, answers = false)
@@ -1695,7 +1695,7 @@ class BreathingViewModelTest {
                 assertThat(timerState.laps.size, `is`(0))
                 // verify button state
                 val buttonState = sut.buttonStateFlow.value
-                assertThat(buttonState.text, `is`(Text.TextRes(R.string.btnStartText)))
+                assertThat(buttonState.text, `is`(TextString.Res(R.string.btnStartText)))
             }
     }
 

@@ -11,7 +11,7 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 
 @RunWith(RobolectricTestRunner::class)
-class TextKtTest {
+class TextStringKtTest {
     // region test cases
 
     // 1- When getAsString invoked, given Text is TextRes, then return correct string fro resId
@@ -25,7 +25,7 @@ class TextKtTest {
     fun `1- When getAsString invoked, given Text is TextRes, then return correct string fro resId`() {
         // Arrange
         val textRes = R.string.app_name
-        val sut = Text.TextRes(textRes)
+        val sut = TextString.Res(textRes)
         val expectedString = InstrumentationRegistry.getInstrumentation().targetContext.getString(textRes)
         // Act
         composeTestRule.setContent {
@@ -40,7 +40,7 @@ class TextKtTest {
         // Arrange
 
         val expectedText = "test2131"
-        val sut = Text.TextString(expectedText)
+        val sut = TextString.String(expectedText)
         // Act
         composeTestRule.setContent {
             val result = sut.getAsString()

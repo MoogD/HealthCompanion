@@ -53,6 +53,6 @@ fun FeatureListScreen(featureFlow: Flow<List<FeatureItem>>) {
 @Composable
 fun FeatureListScreenPreview() {
     val flow = MutableStateFlow(emptyList<FeatureItem>())
-    FeatureListScreen(featureFlow = MutableStateFlow(listOf(FeatureItem(R.string.feature_breathing) {})))
-    flow.tryEmit(listOf(FeatureItem(R.string.feature_breathing) {}))
+    FeatureListScreen(featureFlow = MutableStateFlow(listOf(FeatureItem(R.string.breathing_screen_title) {})))
+    flow.tryEmit(listOf(FeatureItem(R.string.breathing_screen_title) {}))
 }

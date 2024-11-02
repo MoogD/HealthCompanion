@@ -1,9 +1,9 @@
 package com.dom.healthcompanion.domain.breathing.model
 
-import com.dom.healthcompanion.utils.Text
+import com.dom.healthcompanion.utils.TextString
 
 interface BreathingExercise {
-    val title: Text
+    val title: TextString
     val rounds: List<BreathingRound>
     var currenRoundIndex: Int
 

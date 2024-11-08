@@ -4,6 +4,8 @@ import android.content.Context
 import android.os.VibrationEffect
 import android.os.Vibrator
 import com.dom.androidUtils.vibration.VibrationHelperImpl.Companion.DEFAULT_DURATION
+import com.dom.androidUtils.vibration.VibrationHelperImpl.Companion.NO_REPETITION
+import com.dom.logger.Logger
 import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.justRun
@@ -23,12 +25,13 @@ class VibrationHelperImplTest {
 
     private val mockkContext: Context = mockk()
     private val mockkVibrator: Vibrator = mockk()
+    private val logger = mockk<Logger>(relaxed = true)
     private lateinit var sut: VibrationHelperImpl
 
     @BeforeEach
     fun setUp() {
         every { mockkContext.getSystemService(Vibrator::class.java) } returns mockkVibrator
-        sut = VibrationHelperImpl(mockkContext)
+        sut = VibrationHelperImpl(mockkContext, logger)
     }
 
     @AfterEach
@@ -57,7 +60,7 @@ class VibrationHelperImplTest {
                     Pair(DEFAULT_DURATION, VibrationEffect.DEFAULT_AMPLITUDE)
             }
         val expectedEffect = mockk<VibrationEffect>()
-        every { VibrationEffect.createOneShot(lengtht, amplitude) } returns expectedEffect
+        every { VibrationEffect.createWaveform(longArrayOf(DEFAULT_DURATION, DEFAULT_DURATION), NO_REPETITION) } returns expectedEffect
         return expectedEffect
     }
     // endregion

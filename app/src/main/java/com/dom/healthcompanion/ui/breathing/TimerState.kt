@@ -8,4 +8,5 @@ data class TimerState(
     val currentTimeText: String,
     val progress: Float,
     val laps: List<TimerLap> = emptyList(),
+    val shouldKeepScreenOn: Boolean = false,
 )

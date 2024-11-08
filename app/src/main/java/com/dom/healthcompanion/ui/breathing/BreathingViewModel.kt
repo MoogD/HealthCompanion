@@ -69,7 +69,7 @@ class BreathingViewModel
             soundPlayer.init(listOf(R.raw.hero_simple_celebration_03))
         }
 
-        private fun getInitialTimerState() = TimerState(BreathingExercise.RoundType.IDLE, STARTING_TIME_STRING, STARTING_TIME_STRING, 0f)
+        private fun getInitialTimerState() = TimerState(BreathingExercise.RoundType.IDLE, STARTING_TIME_STRING, STARTING_TIME_STRING, 0f, shouldKeepScreenOn = false)
 
         // region button functions
         private fun onStartClicked() {
@@ -78,7 +78,7 @@ class BreathingViewModel
                 previousRounds.clear()
                 _timerStateFlow.value = getInitialTimerState()
             }
-            _timerStateFlow.value = _timerStateFlow.value.copy(type = currentRound.type)
+            _timerStateFlow.value = _timerStateFlow.value.copy(type = currentRound.type, shouldKeepScreenOn = true)
             cleanUpTimer()
             timer = createTimer()
             timer?.setListener(timerListener)
@@ -98,11 +98,13 @@ class BreathingViewModel
             timer?.pause()
             logger.d("next button clicked with ${timer?.time} trackedTime")
             _buttonStateFlow.value = ButtonState(TextString.Res(R.string.btnResumeText), ::onResumeClicked)
+            _timerStateFlow.value = _timerStateFlow.value.copy(shouldKeepScreenOn = false)
             logger.d("buttonstate changed to resume state")
         }
 
         private fun onResumeClicked() {
             _buttonStateFlow.value = ButtonState(TextString.Res(R.string.btnPauseText), ::onPauseClicked)
+            _timerStateFlow.value = _timerStateFlow.value.copy(shouldKeepScreenOn = true)
             logger.d("next button clicked with ${timer?.time} trackedTime. Show onPause button state.")
             timer?.resume()
         }
@@ -158,6 +160,7 @@ class BreathingViewModel
                     _timerStateFlow.value.copy(
                         type = BreathingExercise.RoundType.FINISHED,
                         currentTimeText = STARTING_TIME_STRING,
+                        shouldKeepScreenOn = false,
                     )
             }
             updateButtonState(hasNextRoundBeforeChanging, !hasNextRoundBeforeChanging, trackedTime)

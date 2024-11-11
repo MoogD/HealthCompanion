@@ -11,10 +11,12 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -22,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
+import com.dom.androidUtils.logger.TimberLogger
 import com.dom.healthcompanion.R
 import com.dom.healthcompanion.domain.breathing.model.BreathingExercise
 import com.dom.healthcompanion.ui.TestTags
@@ -29,6 +32,7 @@ import com.dom.healthcompanion.ui.theme.PurpleGrey80
 import com.dom.healthcompanion.utils.ButtonState
 import com.dom.healthcompanion.utils.TextString
 import com.dom.healthcompanion.utils.getAsString
+import com.dom.logger.Logger
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
@@ -39,6 +43,7 @@ fun BreathingScreen(
     timerStateFlow: Flow<TimerState>,
     startButtonStateFlow: Flow<ButtonState>,
     onStopClick: () -> Unit,
+    logger: Logger,
 ) {
     val timerState =
         timerStateFlow.collectAsState(
@@ -52,6 +57,14 @@ fun BreathingScreen(
         )
     val title = titleFlow.collectAsState(initial = TextString.Res(R.string.breathing_screen_default_title))
     val buttonState = startButtonStateFlow.collectAsState(initial = ButtonState(TextString.Res(R.string.btnStartText), {}))
+    val currentView = LocalView.current
+    DisposableEffect(timerState.value.shouldKeepScreenOn) {
+        logger.d("shouldKeepScreenOn: ${timerState.value.shouldKeepScreenOn}")
+        currentView.keepScreenOn = timerState.value.shouldKeepScreenOn
+        onDispose {
+            currentView.keepScreenOn = false
+        }
+    }
     ConstraintLayout(
         modifier =
             Modifier
@@ -200,5 +213,6 @@ fun BreathingScreenPreview() {
             ),
         startButtonStateFlow = flowOf(ButtonState(TextString.Res(R.string.btnStartText), {})),
         onStopClick = {},
+        logger = TimberLogger,
     )
 }

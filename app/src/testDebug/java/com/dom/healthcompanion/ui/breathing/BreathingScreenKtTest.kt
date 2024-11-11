@@ -15,6 +15,7 @@ import com.dom.healthcompanion.R
 import com.dom.healthcompanion.ui.TestTags
 import com.dom.healthcompanion.utils.ButtonState
 import com.dom.healthcompanion.utils.TextString
+import com.dom.logger.Logger
 import com.dom.testUtils.assertCorrectTextShown
 import com.dom.testUtils.assertCountForTag
 import com.dom.testUtils.getProgressIndicatorProgress
@@ -67,6 +68,7 @@ class BreathingScreenKtTest {
     @get:Rule
     val composeTestRule = createComposeRule()
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
+    private val logger = mockk<Logger>(relaxed = true)
 
     @Before
     @Throws(Exception::class)
@@ -111,6 +113,7 @@ class BreathingScreenKtTest {
                 timerStateFlow = timerStateFlow,
                 startButtonStateFlow = buttonStateFlow,
                 onStopClicked,
+                logger,
             )
         }
         // Assert
@@ -138,6 +141,7 @@ class BreathingScreenKtTest {
                 timerStateFlow = timerStateFlow,
                 startButtonStateFlow = buttonStateFlow,
                 onStopClicked,
+                logger,
             )
         }
         // Act
@@ -158,6 +162,7 @@ class BreathingScreenKtTest {
                 timerStateFlow = timerStateFlow,
                 startButtonStateFlow = buttonStateFlow,
                 onStopClicked,
+                logger,
             )
         }
         // Act
@@ -177,6 +182,7 @@ class BreathingScreenKtTest {
                 timerStateFlow = timerStateFlow,
                 startButtonStateFlow = buttonStateFlow,
                 onStopClicked,
+                logger,
             )
         }
         // Act
@@ -196,6 +202,7 @@ class BreathingScreenKtTest {
                 timerStateFlow = timerStateFlow,
                 startButtonStateFlow = buttonStateFlow,
                 onStopClicked,
+                logger,
             )
         }
         // Act
@@ -215,6 +222,7 @@ class BreathingScreenKtTest {
                 timerStateFlow = timerStateFlow,
                 startButtonStateFlow = buttonStateFlow,
                 onStopClicked,
+                logger,
             )
         }
         // Act
@@ -234,6 +242,7 @@ class BreathingScreenKtTest {
                 timerStateFlow = timerStateFlow,
                 startButtonStateFlow = buttonStateFlow,
                 onStopClicked,
+                logger,
             )
         }
         // Act
@@ -253,6 +262,7 @@ class BreathingScreenKtTest {
                 timerStateFlow = timerStateFlow,
                 startButtonStateFlow = buttonStateFlow,
                 onStopClicked,
+                logger,
             )
         }
         // Act
@@ -272,6 +282,7 @@ class BreathingScreenKtTest {
                 timerStateFlow = timerStateFlow,
                 startButtonStateFlow = buttonStateFlow,
                 onStopClicked,
+                logger,
             )
         }
         // Act
@@ -291,6 +302,7 @@ class BreathingScreenKtTest {
                 timerStateFlow = timerStateFlow,
                 startButtonStateFlow = buttonStateFlow,
                 onStopClicked,
+                logger,
             )
         }
         // Act
@@ -308,6 +320,7 @@ class BreathingScreenKtTest {
                 timerStateFlow = timerStateFlow,
                 startButtonStateFlow = buttonStateFlow,
                 onStopClicked,
+                logger,
             )
         }
         val expectedText = "01:00"
@@ -326,6 +339,7 @@ class BreathingScreenKtTest {
                 timerStateFlow = timerStateFlow,
                 startButtonStateFlow = buttonStateFlow,
                 onStopClicked,
+                logger,
             )
         }
         val expectedText = "01:00"
@@ -344,6 +358,7 @@ class BreathingScreenKtTest {
                 timerStateFlow = timerStateFlow,
                 startButtonStateFlow = buttonStateFlow,
                 onStopClicked,
+                logger,
             )
         }
         val newProgress = 0.5f
@@ -363,6 +378,7 @@ class BreathingScreenKtTest {
                 timerStateFlow = timerStateFlow,
                 startButtonStateFlow = buttonStateFlow,
                 onStopClicked,
+                logger,
             )
         }
         val newLaps = timerStateFlow.value.laps.toMutableList()
@@ -390,6 +406,7 @@ class BreathingScreenKtTest {
                 timerStateFlow = timerStateFlow,
                 startButtonStateFlow = buttonStateFlow,
                 onStopClicked,
+                logger,
             )
         }
         composeTestRule.assertCountForTag(laps.size, TestTags.TIMER_LAP_LIST_TEXT_ITEM_TAG)
@@ -414,6 +431,7 @@ class BreathingScreenKtTest {
                 timerStateFlow = timerStateFlow,
                 startButtonStateFlow = buttonStateFlow,
                 onStopClicked,
+                logger,
             )
         }
         composeTestRule.assertCountForTag(laps.size, TestTags.TIMER_LAP_LIST_TEXT_ITEM_TAG)
@@ -446,6 +464,7 @@ class BreathingScreenKtTest {
                 timerStateFlow = timerStateFlow,
                 startButtonStateFlow = buttonStateFlow,
                 onStopClicked,
+                logger,
             )
         }
         // Act
@@ -465,6 +484,7 @@ class BreathingScreenKtTest {
                 timerStateFlow = timerStateFlow,
                 startButtonStateFlow = buttonStateFlow,
                 onStopClicked,
+                logger,
             )
         }
         val newOnClick = mockk<() -> Unit>(relaxed = true)
@@ -487,6 +507,7 @@ class BreathingScreenKtTest {
                 timerStateFlow = timerStateFlow,
                 startButtonStateFlow = buttonStateFlow,
                 onStopClicked,
+                logger,
             )
         }
         // Act
@@ -507,6 +528,7 @@ class BreathingScreenKtTest {
                 timerStateFlow = timerStateFlow,
                 startButtonStateFlow = buttonStateFlow,
                 onStopClicked,
+                logger,
             )
         }
         justRun { onStopClicked() }

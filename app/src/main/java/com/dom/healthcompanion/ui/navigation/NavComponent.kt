@@ -39,6 +39,7 @@ fun NavigationComponent(
                 breathingViewModel.timerStateFlow,
                 breathingViewModel.buttonStateFlow,
                 breathingViewModel::onStopClicked,
+                logger,
             )
         }
     }

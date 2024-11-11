@@ -4,6 +4,7 @@ import android.content.Context
 import android.media.AudioAttributes
 import android.media.SoundPool
 import android.media.SoundPool.OnLoadCompleteListener
+import com.dom.logger.Logger
 import io.mockk.called
 import io.mockk.clearAllMocks
 import io.mockk.clearMocks
@@ -50,12 +51,13 @@ class SoundPlayerImplTest {
 
     private val context = mockk<Context>()
     private val soundPool = mockk<SoundPool>()
+    private val logger = mockk<Logger>(relaxed = true)
 
     private lateinit var sut: SoundPlayerImpl
 
     @BeforeEach
     fun setUp() {
-        sut = SoundPlayerImpl(context)
+        sut = SoundPlayerImpl(context, logger)
     }
 
     @AfterEach
@@ -78,7 +80,7 @@ class SoundPlayerImplTest {
             verify { anyConstructed<SoundPool.Builder>().setAudioAttributes(any()) }
             verify { anyConstructed<SoundPool.Builder>().build() }
             // verify correct attributes builder functions called
-            verify { anyConstructed<AudioAttributes.Builder>().setUsage(AudioAttributes.USAGE_NOTIFICATION_EVENT) }
+            verify { anyConstructed<AudioAttributes.Builder>().setUsage(AudioAttributes.USAGE_ALARM) }
             verify { anyConstructed<AudioAttributes.Builder>().setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION) }
             verify { anyConstructed<AudioAttributes.Builder>().build() }
             // verify onLoadCompleteListener is set
@@ -148,7 +150,7 @@ class SoundPlayerImplTest {
         @Test
         fun `5- given soundPool is not initialized, then throw NotInitializedException`() {
             // Arrange
-            sut = SoundPlayerImpl(context)
+            sut = SoundPlayerImpl(context, logger)
             // Act & Assert
             assertThrows<NotInitializedException> { sut.play(1) }
         }
@@ -311,7 +313,7 @@ class SoundPlayerImplTest {
         // mockk AudioAttributes Builder
         mockkConstructor(AudioAttributes.Builder::class)
         val audioAttributes = mockk<AudioAttributes>()
-        every { anyConstructed<AudioAttributes.Builder>().setUsage(AudioAttributes.USAGE_NOTIFICATION_EVENT) } returns AudioAttributes.Builder()
+        every { anyConstructed<AudioAttributes.Builder>().setUsage(AudioAttributes.USAGE_ALARM) } returns AudioAttributes.Builder()
         every { anyConstructed<AudioAttributes.Builder>().setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION) } returns AudioAttributes.Builder()
         every { anyConstructed<AudioAttributes.Builder>().build() } returns audioAttributes
 

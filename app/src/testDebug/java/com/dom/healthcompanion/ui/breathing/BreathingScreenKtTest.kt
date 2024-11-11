@@ -303,7 +303,6 @@ class BreathingScreenKtTest {
                 startButtonStateFlow = buttonStateFlow,
                 onStopClicked,
                 logger,
-
             )
         }
         // Act

@@ -1677,6 +1677,7 @@ class BreathingViewModelTest {
                 // change current round and trigger new round
                 assertThat(sut.buttonStateFlow.value.text, `is`(TextString.Res(R.string.btnNextText)))
                 expectedExercise.currenRoundIndex = currentRoundIndex
+                clearConstructorMockk(CountUpTimerImpl::class, answers = false)
                 sut.buttonStateFlow.value.onClick()
                 clearConstructorMockk(CountUpTimerImpl::class, answers = false)
                 clearMocks(getCurrentBreathingExerciseUseCase, answers = false)

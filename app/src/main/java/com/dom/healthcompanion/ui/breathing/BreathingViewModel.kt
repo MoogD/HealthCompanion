@@ -1,12 +1,16 @@
 package com.dom.healthcompanion.ui.breathing
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.dom.androidUtils.sound.SoundPlayer
+import com.dom.androidUtils.string.StringManager
 import com.dom.androidUtils.vibration.VibrationHelper
 import com.dom.healthcompanion.R
 import com.dom.healthcompanion.domain.breathing.model.BreathingExercise
 import com.dom.healthcompanion.domain.breathing.usecase.GetCurrentBreathingExerciseUseCase
 import com.dom.healthcompanion.domain.breathing.model.BreathingExercise.Companion.OPEN_TIMER
+import com.dom.healthcompanion.domain.breathing.model.BreathingSummary
+import com.dom.healthcompanion.domain.breathing.usecase.SaveBreathingDataUseCase
 import com.dom.healthcompanion.utils.ButtonState
 import com.dom.healthcompanion.utils.TextString
 import com.dom.logger.Logger
@@ -19,14 +23,17 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 
 @HiltViewModel
 class BreathingViewModel
     @Inject
     constructor(
         private val getCurrentBreathingExerciseUseCase: GetCurrentBreathingExerciseUseCase,
+        private val saveBreathingDataUseCase: SaveBreathingDataUseCase,
         private val dispatchersProvider: DispatchersProvider,
         private val vibrationHelper: VibrationHelper,
+        private val stringManager: StringManager,
         private val soundPlayer: SoundPlayer,
         private val logger: Logger,
     ) : ViewModel() {
@@ -162,9 +169,36 @@ class BreathingViewModel
                         currentTimeText = STARTING_TIME_STRING,
                         shouldKeepScreenOn = false,
                     )
+                val titleString =
+                    getCurrentExerciseTitleString()
+                val breathingSummary =
+                    getSummaryForCurrentExercise(titleString)
+                viewModelScope.launch {
+                    saveBreathingDataUseCase(breathingSummary)
+                    logger.d("Summary of current exercise saved!")
+                }
             }
             updateButtonState(hasNextRoundBeforeChanging, !hasNextRoundBeforeChanging, trackedTime)
         }
+
+        private fun getSummaryForCurrentExercise(titleString: String) =
+            BreathingSummary(
+                titleString,
+                currentExercise.rounds.mapIndexedNotNull { index, round ->
+                    val actualTime = previousRounds.getOrNull(index) ?: return@mapIndexedNotNull null
+                    BreathingSummary.BreathingRoundSummary(
+                        round.type,
+                        round.expectedTime,
+                        actualTime,
+                    )
+                },
+            )
+
+        private fun getCurrentExerciseTitleString() =
+            when (val title = currentExercise.title) {
+                is TextString.Res -> stringManager.getString(title.resId)
+                is TextString.String -> title.text
+            }
         // endregion
 
         private fun updateButtonState(

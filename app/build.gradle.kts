@@ -112,6 +112,12 @@ dependencies {
     kspTest(libs.hilt.android.compiler)
     testImplementation(libs.hilt.testing)
 
+    // room
+    implementation(libs.room.ktx)
+    ksp(libs.room.compiler)
+    testImplementation(libs.room.testing)
+    implementation(libs.gson)
+
     // kover report
     kover(project(":timer"))
     kover(project(":utils"))

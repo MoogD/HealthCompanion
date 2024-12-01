@@ -15,7 +15,8 @@ class SaveBreathingDataUseCase
     ) {
         suspend operator fun invoke(breathingData: BreathingSummary) {
             withContext(dispatchersProvider.io) {
-                val data = BreathingDataEntity.fromBreathingSummary(breathingData)
+                val timestamp = System.currentTimeMillis()
+                val data = BreathingDataEntity.fromBreathingSummary(breathingData, timestamp)
                 breathingSummaryDataSource.saveBreathingData(data)
             }
         }

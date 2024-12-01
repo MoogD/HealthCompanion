@@ -10,14 +10,19 @@ import com.dom.healthcompanion.domain.breathing.model.BreathingSummary
 @TypeConverters(BreathingConverter::class)
 data class BreathingDataEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    @ColumnInfo(name = "timestamp") val timestamp: Long,
     @ColumnInfo(name = "title") val title: String,
     @ColumnInfo(name = "rounds") val rounds: List<BreathingSummary.BreathingRoundSummary>,
 ) {
     companion object {
-        fun fromBreathingSummary(breathingSummary: BreathingSummary): BreathingDataEntity {
+        fun fromBreathingSummary(
+            breathingSummary: BreathingSummary,
+            timestamp: Long,
+        ): BreathingDataEntity {
             return BreathingDataEntity(
                 title = breathingSummary.title,
                 rounds = breathingSummary.rounds,
+                timestamp = timestamp,
             )
         }
     }

@@ -186,8 +186,9 @@ class BreathingViewModel
                 titleString,
                 currentExercise.rounds.mapIndexedNotNull { index, round ->
                     val actualTime = previousRounds.getOrNull(index) ?: return@mapIndexedNotNull null
+                    val type = BreathingSummary.RoundType.from(round.type) ?: return@mapIndexedNotNull null
                     BreathingSummary.BreathingRoundSummary(
-                        round.type,
+                        type,
                         round.expectedTime,
                         actualTime,
                     )

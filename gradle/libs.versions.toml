@@ -83,3 +83,4 @@ jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "jetbrai
 kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kover" }
 mockposable = { id = "com.jeppeman.mockposable", version.ref = "mockposable" }
 android-library = { id = "com.android.library", version.ref = "agp" }
+room = { id = "androidx.room", version.ref = "room"}

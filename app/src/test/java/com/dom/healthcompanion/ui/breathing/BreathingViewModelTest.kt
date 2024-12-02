@@ -5,11 +5,14 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStore
 import app.cash.turbine.test
 import com.dom.androidUtils.sound.SoundPlayer
+import com.dom.androidUtils.string.StringManager
 import com.dom.androidUtils.vibration.VibrationHelper
 import com.dom.healthcompanion.R
 import com.dom.healthcompanion.domain.breathing.model.BreathingExercise
+import com.dom.healthcompanion.domain.breathing.model.BreathingSummary
 import com.dom.healthcompanion.domain.breathing.model.ButeykoBreathing
 import com.dom.healthcompanion.domain.breathing.usecase.GetCurrentBreathingExerciseUseCase
+import com.dom.healthcompanion.domain.breathing.usecase.SaveBreathingDataUseCase
 import com.dom.healthcompanion.utils.TextString
 import com.dom.logger.Logger
 import com.dom.testUtils.TestDispatcherProvider
@@ -20,6 +23,7 @@ import io.mockk.EqMatcher
 import io.mockk.clearAllMocks
 import io.mockk.clearConstructorMockk
 import io.mockk.clearMocks
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.justRun
 import io.mockk.mockk
@@ -27,20 +31,30 @@ import io.mockk.mockkConstructor
 import io.mockk.slot
 import io.mockk.verify
 import java.util.concurrent.TimeUnit
+import java.util.stream.Stream
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert.assertThat
+import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtensionContext
 import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.ArgumentsProvider
+import org.junit.jupiter.params.provider.ArgumentsSource
 import org.junit.jupiter.params.provider.ValueSource
 
 class BreathingViewModelTest {
     // region test cases
-    // next test number to use: 41
 
     // 1- When initialized, then show title of current exercise
     // 2- When initialized, then show timerState with idle round type, starting time for current and total time, 0 progress and no laps
@@ -78,19 +92,21 @@ class BreathingViewModelTest {
     // 30- When onFinish invoked, given current round is not open timer and there is next round that does not start automatically, then add passed time from timer to laps in timerState
     // 31- When onFinish invoked, given there is next round, then update currentRoundIndex and timerState title and create and start new timer for next Round
     // 32- When onFinish invoked, given there is no next round, then show finished timerState and start button
-    // 33- When onFinish invoked, given there is next round that is open timer, then show next button state
-    // 34- When onFinish invoked, given there is next round that is not open timer, then show pause button state
-    // 35- When onFinish invoked, then call vibrationHelper vibrate with notifyUser type and play correct sound
+    // 33- When onFinish invoked, given there is no next round and title is StringRes, then save data with title from stringManager getString
+    // 34- When onFinish invoked, given there is no next round and title is String, then save data with title
+    // 35- When onFinish invoked, given there is next round that is open timer, then show next button state
+    // 36- When onFinish invoked, given there is next round that is not open timer, then show pause button state
+    // 37- When onFinish invoked, then call vibrationHelper vibrate with notifyUser type and play correct sound
 
-    // 36- When onCleared invoked, given there is timer, then call stop on timer and remove listeners and call destroy on soundPlayer
-    // 37- When onCleared invoked, given there is no timer, then call destroy on soundPlayer
+    // 38- When onCleared invoked, given there is timer, then call stop on timer and remove listeners and call destroy on soundPlayer
+    // 39- When onCleared invoked, given there is no timer, then call destroy on soundPlayer
 
-    // 38- When pause button state clicked, then call pause on timer and show resume button state
+    // 40- When pause button state clicked, then call pause on timer and show resume button state
 
-    // 39- When resume button state clicked, then call resume on timer and show pause button state
+    // 41- When resume button state clicked, then call resume on timer and show pause button state
 
-    // 40- When onStopClicked invoked, given there is no timer, then reset current exercise, button and timer states
-    // 41- When onStopClicked invoked, given there is a timer, then call stop on timer and remove listeners and reset current exercise, button and timer states
+    // 42- When onStopClicked invoked, given there is no timer, then reset current exercise, button and timer states
+    // 43- When onStopClicked invoked, given there is a timer, then call stop on timer and remove listeners and reset current exercise, button and timer states
 
     // endregion
     val defaultExercise = ButeykoBreathing()
@@ -98,8 +114,8 @@ class BreathingViewModelTest {
     private val mockVibrationHelper = mockk<VibrationHelper>(relaxed = true)
     private val mockSoundPlayer = mockk<SoundPlayer>(relaxed = true)
     private val logger: Logger = mockk(relaxed = true)
-
-    private val testDispatcher = TestDispatcherProvider()
+    private val stringManager: StringManager = mockk(relaxed = true)
+    private val saveBreathingDataUseCase: SaveBreathingDataUseCase = mockk(relaxed = true)
 
     private lateinit var sut: BreathingViewModel
 
@@ -1318,8 +1334,85 @@ class BreathingViewModelTest {
                 assertThat(sut.buttonStateFlow.value.text, `is`(TextString.Res(R.string.btnStartText)))
             }
 
+        @ParameterizedTest
+        @ArgumentsSource(SkippableRoundsBreathingExerciseWithResTitleProvider::class)
+        fun `33- given there is no next round and title is StringRes, then save data with title from stringManager getString`(breathingExercise: BreathingExercise) =
+            runTest {
+                val titleRes = (breathingExercise.title as TextString.Res).resId
+                val defaultPassedTime = 2L
+                val listenerSlot = slot<CountUpTimer.Listener>()
+                val savedDataSlot = slot<BreathingSummary>()
+                mockkConstructor(CountUpTimerImpl::class)
+                every { anyConstructed<CountUpTimerImpl>().stop() } returns maxOf(defaultPassedTime, breathingExercise.currentRound.expectedTime)
+                justRun { anyConstructed<CountUpTimerImpl>().setListener(capture(listenerSlot)) }
+                every { getCurrentBreathingExerciseUseCase() } returns breathingExercise
+                every { stringManager.getString(titleRes) } returns titleRes.toString()
+                initSut()
+                // start timer
+                sut.buttonStateFlow.value.onClick()
+                // Act
+                // skip through all rounds
+                breathingExercise.rounds.forEachIndexed { index, round ->
+                    val passedTime = maxOf(defaultPassedTime, round.expectedTime)
+                    listenerSlot.captured.onFinish(passedTime)
+                    if (round.expectedTime == BreathingExercise.OPEN_TIMER) {
+                        sut.buttonStateFlow.value.onClick()
+                    }
+                }
+                // Assert
+                coVerify { saveBreathingDataUseCase(capture(savedDataSlot)) }
+                assertThat(savedDataSlot.captured.title, `is`(titleRes.toString()))
+                assertThat(savedDataSlot.captured.rounds.size, `is`(breathingExercise.rounds.size))
+                savedDataSlot.captured.rounds.forEachIndexed { index, round ->
+                    val exerciseRound = breathingExercise.rounds[index]
+                    val expectedRoundType = BreathingSummary.RoundType.from(exerciseRound.type)
+                    val passedTime = maxOf(defaultPassedTime, exerciseRound.expectedTime)
+                    assertThat(round.type, `is`(expectedRoundType))
+                    assertThat(round.expectedTime, `is`(exerciseRound.expectedTime))
+                    assertThat(round.actualTime, `is`(passedTime))
+                }
+            }
+
+        @ParameterizedTest
+        @ArgumentsSource(SkippableRoundsBreathingExerciseWithStringTitleProvider::class)
+        fun `34- given there is no next round and title is String, then save data with title`(breathingExercise: BreathingExercise) =
+            runTest {
+                val defaultPassedTime = 2L
+                val title = (breathingExercise.title as TextString.String).text
+                val listenerSlot = slot<CountUpTimer.Listener>()
+                val savedDataSlot = slot<BreathingSummary>()
+                mockkConstructor(CountUpTimerImpl::class)
+                every { anyConstructed<CountUpTimerImpl>().stop() } returns maxOf(defaultPassedTime, breathingExercise.currentRound.expectedTime)
+                justRun { anyConstructed<CountUpTimerImpl>().setListener(capture(listenerSlot)) }
+                every { getCurrentBreathingExerciseUseCase() } returns breathingExercise
+                initSut()
+                // start timer
+                sut.buttonStateFlow.value.onClick()
+                // Act
+                // skip through all rounds
+                breathingExercise.rounds.forEachIndexed { index, round ->
+                    val passedTime = maxOf(defaultPassedTime, round.expectedTime)
+                    listenerSlot.captured.onFinish(passedTime)
+                    if (round.expectedTime == BreathingExercise.OPEN_TIMER) {
+                        sut.buttonStateFlow.value.onClick()
+                    }
+                }
+                // Assert
+                coVerify { saveBreathingDataUseCase(capture(savedDataSlot)) }
+                assertThat(savedDataSlot.captured.title, `is`(title))
+                assertThat(savedDataSlot.captured.rounds.size, `is`(breathingExercise.rounds.size))
+                savedDataSlot.captured.rounds.forEachIndexed { index, round ->
+                    val exerciseRound = breathingExercise.rounds[index]
+                    val expectedRoundType = BreathingSummary.RoundType.from(exerciseRound.type)
+                    val passedTime = maxOf(defaultPassedTime, exerciseRound.expectedTime)
+                    assertThat(round.type, `is`(expectedRoundType))
+                    assertThat(round.expectedTime, `is`(exerciseRound.expectedTime))
+                    assertThat(round.actualTime, `is`(passedTime))
+                }
+            }
+
         @Test
-        fun `33- given there is next round that is open timer, then show next button state`() =
+        fun `35- given there is next round that is open timer, then show next button state`() =
             runTest {
                 val listenerSlot = slot<CountUpTimer.Listener>()
                 val passedTime = 200L
@@ -1356,7 +1449,7 @@ class BreathingViewModelTest {
             }
 
         @Test
-        fun `34- given there is next round that is not open timer, then show pause button state`() =
+        fun `36- given there is next round that is not open timer, then show pause button state`() =
             runTest {
                 val passedTime = 200L
                 val listenerSlot = slot<CountUpTimer.Listener>()
@@ -1393,7 +1486,7 @@ class BreathingViewModelTest {
             }
 
         @Test
-        fun `35- then call vibrationHelper vibrate with notifyUser type and play correct sound`() =
+        fun `37- then call vibrationHelper vibrate with notifyUser type and play correct sound`() =
             runTest {
                 val passedTime = 200L
                 val listenerSlot = slot<CountUpTimer.Listener>()
@@ -1417,7 +1510,7 @@ class BreathingViewModelTest {
     @DisplayName("When onCleared invoked")
     inner class OnCleared {
         @Test
-        fun `36- given there is timer, then call stop on timer and remove listeners and call destroy on soundPlayer`() =
+        fun `38- given there is timer, then call stop on timer and remove listeners and call destroy on soundPlayer`() =
             runTest {
                 // Arrange
                 mockkConstructor(CountUpTimerImpl::class)
@@ -1464,7 +1557,7 @@ class BreathingViewModelTest {
             }
 
         @Test
-        fun `37- given there is no timer, then call destroy on soundPlayer`() =
+        fun `39- given there is no timer, then call destroy on soundPlayer`() =
             runTest {
                 // Arrange
                 val viewModelStore = ViewModelStore()
@@ -1489,7 +1582,7 @@ class BreathingViewModelTest {
     }
 
     @Test
-    fun `38- When pause button state clicked, then call pause on timer and show resume button state`() =
+    fun `40- When pause button state clicked, then call pause on timer and show resume button state`() =
         runTest {
             // Arrange
             mockkConstructor(CountUpTimerImpl::class)
@@ -1528,7 +1621,7 @@ class BreathingViewModelTest {
         }
 
     @Test
-    fun `39- When resume button state clicked, then call resume on timer and show pause button state`() =
+    fun `41- When resume button state clicked, then call resume on timer and show pause button state`() =
         runTest {
             // Arrange
             mockkConstructor(CountUpTimerImpl::class)
@@ -1573,7 +1666,7 @@ class BreathingViewModelTest {
     @DisplayName("When onStopClicked invoked")
     inner class OnStopClicked {
         @Test
-        fun `40- given there is no timer, then reset current exercise, button and timer states`() =
+        fun `42- given there is no timer, then reset current exercise, button and timer states`() =
             runTest {
                 // Arrange
                 mockkConstructor(CountUpTimerImpl::class)
@@ -1616,7 +1709,7 @@ class BreathingViewModelTest {
 
         @ParameterizedTest
         @ValueSource(ints = [1, 2, 3, 4, 5])
-        fun `41- given there is a timer, then call stop on timer and remove listeners and reset current exercise, button and timer states`(currentRoundIndex: Int) =
+        fun `43- given there is a timer, then call stop on timer and remove listeners and reset current exercise, button and timer states`(currentRoundIndex: Int) =
             runTest {
                 // Arrange
                 mockkConstructor(CountUpTimerImpl::class)
@@ -1702,7 +1795,172 @@ class BreathingViewModelTest {
 
     // region helper functions
     private fun initSut() {
-        sut = BreathingViewModel(getCurrentBreathingExerciseUseCase, testDispatcher, mockVibrationHelper, mockSoundPlayer, logger)
+        sut = BreathingViewModel(getCurrentBreathingExerciseUseCase, saveBreathingDataUseCase, testDispatcher, mockVibrationHelper, stringManager, mockSoundPlayer, logger)
     }
     // endregion
+
+    // region argumentsProvider
+    private class SkippableRoundsBreathingExerciseWithResTitleProvider : ArgumentsProvider {
+        override fun provideArguments(context: ExtensionContext?): Stream<out Arguments> {
+            return Stream.of(
+                Arguments.of(
+                    object : BreathingExercise {
+                        override val title = TextString.Res(R.string.buteyko_breathing_title)
+                        override val rounds: List<BreathingExercise.BreathingRound>
+                            get() =
+                                listOf(
+                                    BreathingExercise.BreathingRound(
+                                        1000,
+                                        BreathingExercise.RoundType.NORMAL_BREATHING,
+                                        false,
+                                    ),
+                                )
+                        override var currenRoundIndex: Int = 0
+                    },
+                ),
+                Arguments.of(
+                    object : BreathingExercise {
+                        override val title = TextString.Res(R.string.breathing_screen_default_title)
+                        override val rounds: List<BreathingExercise.BreathingRound>
+                            get() =
+                                listOf(
+                                    BreathingExercise.BreathingRound(
+                                        BreathingExercise.OPEN_TIMER,
+                                        BreathingExercise.RoundType.INHALE,
+                                        false,
+                                    ),
+                                    BreathingExercise.BreathingRound(
+                                        1000,
+                                        BreathingExercise.RoundType.HOLD,
+                                        false,
+                                    ),
+                                    BreathingExercise.BreathingRound(
+                                        243234,
+                                        BreathingExercise.RoundType.EXHALE,
+                                        false,
+                                    ),
+                                )
+                        override var currenRoundIndex: Int = 0
+                    },
+                ),
+                Arguments.of(
+                    object : BreathingExercise {
+                        override val title = TextString.Res(R.string.btnStartText)
+                        override val rounds: List<BreathingExercise.BreathingRound>
+                            get() =
+                                listOf(
+                                    BreathingExercise.BreathingRound(
+                                        12312,
+                                        BreathingExercise.RoundType.LOWER_BREATHING,
+                                        false,
+                                    ),
+                                    BreathingExercise.BreathingRound(
+                                        BreathingExercise.OPEN_TIMER,
+                                        BreathingExercise.RoundType.NORMAL_BREATHING,
+                                        false,
+                                    ),
+                                    BreathingExercise.BreathingRound(
+                                        243234,
+                                        BreathingExercise.RoundType.EXHALE,
+                                        false,
+                                    ),
+                                )
+                        override var currenRoundIndex: Int = 0
+                    },
+                ),
+            )
+        }
+    }
+
+    private class SkippableRoundsBreathingExerciseWithStringTitleProvider : ArgumentsProvider {
+        override fun provideArguments(context: ExtensionContext?): Stream<out Arguments> {
+            return Stream.of(
+                Arguments.of(
+                    object : BreathingExercise {
+                        override val title = TextString.String("Test")
+                        override val rounds: List<BreathingExercise.BreathingRound>
+                            get() =
+                                listOf(
+                                    BreathingExercise.BreathingRound(
+                                        1000,
+                                        BreathingExercise.RoundType.NORMAL_BREATHING,
+                                        false,
+                                    ),
+                                )
+                        override var currenRoundIndex: Int = 0
+                    },
+                ),
+                Arguments.of(
+                    object : BreathingExercise {
+                        override val title = TextString.String("Buteyko")
+                        override val rounds: List<BreathingExercise.BreathingRound>
+                            get() =
+                                listOf(
+                                    BreathingExercise.BreathingRound(
+                                        BreathingExercise.OPEN_TIMER,
+                                        BreathingExercise.RoundType.INHALE,
+                                        false,
+                                    ),
+                                    BreathingExercise.BreathingRound(
+                                        1000,
+                                        BreathingExercise.RoundType.HOLD,
+                                        false,
+                                    ),
+                                    BreathingExercise.BreathingRound(
+                                        243234,
+                                        BreathingExercise.RoundType.EXHALE,
+                                        false,
+                                    ),
+                                )
+                        override var currenRoundIndex: Int = 0
+                    },
+                ),
+                Arguments.of(
+                    object : BreathingExercise {
+                        override val title = TextString.String("asfasdfasdfa")
+                        override val rounds: List<BreathingExercise.BreathingRound>
+                            get() =
+                                listOf(
+                                    BreathingExercise.BreathingRound(
+                                        12312,
+                                        BreathingExercise.RoundType.LOWER_BREATHING,
+                                        false,
+                                    ),
+                                    BreathingExercise.BreathingRound(
+                                        BreathingExercise.OPEN_TIMER,
+                                        BreathingExercise.RoundType.NORMAL_BREATHING,
+                                        false,
+                                    ),
+                                    BreathingExercise.BreathingRound(
+                                        243234,
+                                        BreathingExercise.RoundType.EXHALE,
+                                        false,
+                                    ),
+                                )
+                        override var currenRoundIndex: Int = 0
+                    },
+                ),
+            )
+        }
+    }
+    // endregion
+
+    companion object {
+        // Set and reset Main dispatcher only once to avoid conflicts between tests
+        internal val testDispatcher = TestDispatcherProvider()
+
+        @OptIn(ExperimentalCoroutinesApi::class)
+        @BeforeAll
+        @JvmStatic
+        fun init() {
+            Dispatchers.setMain(testDispatcher.main)
+        }
+
+        @OptIn(ExperimentalCoroutinesApi::class)
+        @AfterAll
+        @JvmStatic
+        fun destroy() {
+            Dispatchers.resetMain()
+        }
+    }
 }

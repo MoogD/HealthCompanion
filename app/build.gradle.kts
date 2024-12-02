@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.hilt)
     alias(libs.plugins.kover)
     alias(libs.plugins.mockposable)
+    alias(libs.plugins.room)
 }
 
 android {
@@ -54,7 +55,11 @@ android {
             isIncludeAndroidResources = true
         }
     }
+    room {
+        schemaDirectory("$projectDir/schemas")
+    }
     tasks.withType<Test> {
+        maxParallelForks = 5
         useJUnitPlatform()
         enabled = true
     }
@@ -141,6 +146,7 @@ kover {
                     "*_HiltModules*",
                     "*_Factory*",
                     "*_MembersInjector*",
+                    "*_Impl*",
                     "*ComposableSingletons*",
                     // exclude ui specifics
                     "com.dom.healthcompanion.ui.theme.*",

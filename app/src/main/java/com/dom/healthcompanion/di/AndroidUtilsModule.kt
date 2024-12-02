@@ -6,6 +6,8 @@ import com.dom.androidUtils.sound.SoundPlayer
 import com.dom.androidUtils.sound.SoundPlayerImpl
 import com.dom.androidUtils.string.StringManager
 import com.dom.androidUtils.string.StringManagerImpl
+import com.dom.androidUtils.time.TimeHelper
+import com.dom.androidUtils.time.TimeHelperImpl
 import com.dom.androidUtils.vibration.VibrationHelper
 import com.dom.androidUtils.vibration.VibrationHelperImpl
 import com.dom.logger.Logger
@@ -46,5 +48,10 @@ object AndroidUtilsModule {
         @ApplicationContext context: Context,
     ): StringManager {
         return StringManagerImpl(context)
+    }
+
+    @Provides
+    fun provideTimeHelper(): TimeHelper {
+        return TimeHelperImpl()
     }
 }

@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.hilt)
     alias(libs.plugins.kover)
     alias(libs.plugins.mockposable)
+    alias(libs.plugins.room)
 }
 
 android {
@@ -54,7 +55,11 @@ android {
             isIncludeAndroidResources = true
         }
     }
+    room {
+        schemaDirectory("$projectDir/schemas")
+    }
     tasks.withType<Test> {
+        maxParallelForks = 5
         useJUnitPlatform()
         enabled = true
     }
@@ -112,6 +117,12 @@ dependencies {
     kspTest(libs.hilt.android.compiler)
     testImplementation(libs.hilt.testing)
 
+    // room
+    implementation(libs.room.ktx)
+    ksp(libs.room.compiler)
+    testImplementation(libs.room.testing)
+    implementation(libs.gson)
+
     // kover report
     kover(project(":timer"))
     kover(project(":utils"))
@@ -135,6 +146,7 @@ kover {
                     "*_HiltModules*",
                     "*_Factory*",
                     "*_MembersInjector*",
+                    "*_Impl*",
                     "*ComposableSingletons*",
                     // exclude ui specifics
                     "com.dom.healthcompanion.ui.theme.*",

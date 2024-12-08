@@ -173,7 +173,7 @@ class BreathingViewModel
                     getCurrentExerciseTitleString()
                 val breathingSummary =
                     getSummaryForCurrentExercise(titleString)
-                viewModelScope.launch {
+                viewModelScope.launch(dispatchersProvider.main) {
                     saveBreathingDataUseCase(breathingSummary)
                     logger.d("Summary of current exercise saved!")
                 }

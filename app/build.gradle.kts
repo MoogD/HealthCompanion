@@ -11,13 +11,13 @@ plugins {
 
 android {
     namespace = "com.dom.healthcompanion"
-    compileSdk = 34
+    compileSdkVersion(rootProject.extra["compileSdkVersion"] as Int)
 
     defaultConfig {
         applicationId = "com.dom.healthcompanion"
         minSdk = 24
-        // Robolectric not running with sdk 35
-        targetSdk = 34
+        targetSdk = 35
+        maxSdk = 35
         versionCode = 1
         versionName = "1.0"
 
@@ -37,11 +37,11 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_17.toString()
+        jvmTarget = JavaVersion.VERSION_21.toString()
     }
     buildFeatures {
         compose = true

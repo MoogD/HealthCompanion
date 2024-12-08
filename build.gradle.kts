@@ -10,6 +10,7 @@ plugins {
     alias(libs.plugins.android.library) apply false
     alias(libs.plugins.room) apply false
 }
+val compileSdkVersion by extra(35)
 
 subprojects {
     // TODO: Check how to use version catalog here

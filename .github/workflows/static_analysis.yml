@@ -32,3 +32,30 @@ jobs:
 
       - name: Run unit tests
         run: ./gradlew test
+
+      - name: Generate kover coverage report
+        run: ./gradlew koverXmlReport
+
+      - name: Add branch coverage report to PR
+        id: koverBranchHealthCompanion
+        uses: mi-kas/kover-report@v1
+        with:
+          path: |
+            ${{ github.workspace }}/app/build/reports/kover/report.xml
+          title: Code Coverage Branch
+          update-comment: true
+          min-coverage-overall: 80
+          min-coverage-changed-files: 80
+          coverage-counter-type: BRANCH
+
+      - name: Add line coverage report to PR
+        id: koverLineHealthCompanion
+        uses: mi-kas/kover-report@v1
+        with:
+          path: |
+            ${{ github.workspace }}/app/build/reports/kover/report.xml
+          title: Code Coverage Line
+          update-comment: true
+          min-coverage-overall: 80
+          min-coverage-changed-files: 80
+          coverage-counter-type: LINE
